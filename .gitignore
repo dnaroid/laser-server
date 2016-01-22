@@ -5,5 +5,4 @@
 app.db
 search.db
 venv
-.idea
-
+/.idea

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+
     <title>LaserSq</title>
     <link href="/static/css/bootstrap.min.css" rel="stylesheet" media="screen">
     <link href="/static/css/bootstrap-responsive.min.css" rel="stylesheet">
@@ -9,34 +10,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
-<div class="container">
-    <div class="navbar">
-        <div class="navbar-inner">
-            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </a>
-            <a class="brand" href="/">LaserSq</a>
-            <ul class="nav">
-                <li><a href="{{ url_for('index') }}">Home</a></li>
-                {% if g.user.is_authenticated %}
-                {% endif %}
-            </ul>
-            <div class="nav pull-right">
-                {% if g.user.is_authenticated %}
-                <li><a href="{{ url_for('user', username = g.user.username) }}">Your Profile</a></li>
-                <li><a href="{{ url_for('logout') }}">Logout</a></li>
-
-                {% endif %}
+<div class="container ">
+    <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="{{ url_for('index') }}"> LaserSq</a>
             </div>
+            <ul class="nav navbar-nav">
+                <li><a href="{{ url_for('index') }}"> Home</a></li>
+                <li><a href="#"> Page 1</a></li>
+                <li><a href="#"> Page 2</a></li>
+                <li><a href="#"> Page 3</a></li>
+            </ul>
+            {% if g.user.is_authenticated %}
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="{{ url_for('user', username = g.user.username) }}"><span
+                        class="glyphicon glyphicon-user"></span> Profile</a></li>
+                <li><a href="{{ url_for('logout') }}"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+            </ul>
+            {% else %}
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="{{ url_for('register') }}"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
+                <li><a href="{{ url_for('login') }}"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+            </ul>
+            {% endif %}
         </div>
-    </div>
-    <div class="row">
-        <div class="span12">
-            {% block content %}{% endblock %}
-        </div>
-    </div>
+    </nav>
+
+    {% include 'flash.html' %}
+    {% block content %}{% endblock %}
+
 </div>
 </body>
 </html>

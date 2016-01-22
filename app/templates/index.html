@@ -2,11 +2,14 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Hi, {{user.username}}!</h1>
-{% include 'flash.html' %}
-{% for post in posts %}
+<!--{% if g.user.is_authenticated %}-->
+<!--<h1>Hi, {{g.username}}!</h1>-->
+<!--{% else %}-->
+<!--<h1>Hi, anonimus!</h1>-->
+<!--{% endif %}-->
+{% for u in users %}
 <p>
-    {{post.author.username}} says: <b>{{post.body}}</b>
+    {{u.username}} </b>
 </p>
 {% endfor %}
 {% endblock %}

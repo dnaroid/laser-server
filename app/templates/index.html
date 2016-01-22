@@ -1,11 +1,12 @@
 <!-- extend base layout -->
 {% extends "base.html" %}
 
-{% block body %}
+{% block content %}
 <h1>Hi, {{user.username}}!</h1>
+{% include 'flash.html' %}
 {% for post in posts %}
 <p>
-  {{post.author.nickname}} says: <b>{{post.body}}</b>
+    {{post.author.username}} says: <b>{{post.body}}</b>
 </p>
 {% endfor %}
 {% endblock %}

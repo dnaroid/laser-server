@@ -1,8 +1,11 @@
 *.pyc
 *.pyo
-*.wpr
-*.wpu
 app.db
 search.db
-venv
+/tmp
+/venv
 /.idea
+/New Project #2.wpu
+/New Project #2.wpr
+
+

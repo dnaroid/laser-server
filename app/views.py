@@ -55,11 +55,11 @@ def index():
     user = g.user
     posts = [
         {
-            'author': {'nickname': 'John'},
+            'author': {'username': 'John'},
             'body': 'Beautiful day in Portland!'
         },
         {
-            'author': {'nickname': 'Susan'},
+            'author': {'username': 'Susan'},
             'body': 'The Avengers movie was so cool!'
         }
     ]
@@ -73,3 +73,17 @@ def index():
 def logout():
     logout_user()
     return redirect(url_for('index'))
+
+
+@app.route('/user/<username>')
+@app.route('/user/<username>/<int:page>')
+@login_required
+def user(username, page=1):
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        flash('User ' + username + ' not found.')
+        return redirect(url_for('index'))
+    # posts = user.posts.paginate(page, POSTS_PER_PAGE, False)
+    return render_template('user.html',
+                           user=user)  # ,
+    # posts=posts)

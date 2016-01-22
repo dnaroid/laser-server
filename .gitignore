@@ -1,6 +1,8 @@
 *.pyc
 *.pyo
+*.wpr
+*.wpu
 app.db
 search.db
-flask
+venv
 

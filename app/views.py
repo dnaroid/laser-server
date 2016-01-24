@@ -1,8 +1,11 @@
+import re
+
 from flask import render_template, flash, redirect, url_for, request, g
 from flask_login import login_user, logout_user, current_user, login_required
 from app import app, db, lm
 from models import User, ROLE_USER, ROLE_ADMIN
 from datetime import datetime
+from flask_babel import gettext as _
 
 
 @lm.user_loader
@@ -14,17 +17,37 @@ def load_user(id):
 def register():
     if request.method == 'GET':
         return render_template('register.html')
-    u = User()
-    u.username = request.form['username']
-    u.password = request.form['password']
-    u.email = request.form['email']
-    if User.query.filter_by(username=u.username):
-        flash('Nickname aleady in use', category='danger')
+    username = request.form['username']
+    username = re.sub('[^a-zA-Z0-9_\.]', '', username)
+    password = request.form['password']
+    password2 = request.form['password2']
+    email = request.form['email']
+    u = User.query.filter_by(username=username).first()
+    if len(username) < 4:
+        flash(_('Name too short, 4 is minimal length!'), category='danger')
         return redirect(url_for('register'))
-    db.session.add(u)
+    if u is not None:
+        flash(_('Nickname aleady in use!'), category='danger')
+        return redirect(url_for('register'))
+    if len(password) < 4:
+        flash('Password too short, 4 is minimal length!', category='danger')
+        return redirect(url_for('register'))
+    if len(password) > 10:
+        flash('Password too long, 10 is maximal length!', category='danger')
+        return redirect(url_for('register'))
+    if password != password2:
+        flash('Check password error!', category='danger')
+        return redirect(url_for('register'))
+    if len(email) < 4:
+        flash('Enter valid email!', category='danger')
+        return redirect(url_for('register'))
+    user = User(username=username, password=password, email=email,
+                role=ROLE_USER)
+    db.session.add(user)
     db.session.commit()
-    flash('User successfully registered', category='success')
-    return redirect(url_for('login'))
+    flash('Registration succesfull', category='success')
+    login_user(user)
+    return redirect(url_for('index'))
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -77,5 +100,4 @@ def user(username, page=1):
     if user is None:
         flash('User ' + username + ' not found.', category='success')
         return redirect(url_for('index'))
-    # posts = user.posts.paginate(page, POSTS_PER_PAGE, False)
-    return render_template('user.html', user=user)
+    return render_template('user.html', last_seen="", user=user)

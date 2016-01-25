@@ -17,9 +17,9 @@
             </div>
             <ul class="nav navbar-nav">
                 <li><a href="{{ url_for('index') }}"> Home</a></li>
-                <!--<li><a href="#"> Page 1</a></li>-->
-                <!--<li><a href="#"> Page 2</a></li>-->
-                <!--<li><a href="#"> Page 3</a></li>-->
+                {% if g.user.is_authenticated %}
+                <li><a href="{{ url_for('room',username=current_user.username) }}"> Room</a></li>
+                {% endif %}
             </ul>
             {% if g.user.is_authenticated %}
             <ul class="nav navbar-nav navbar-right">
@@ -40,5 +40,14 @@
     {% block content %}{% endblock %}
 
 </div>
+{% if g.user.is_authenticated %}
+<script type="text/javascript">// <![CDATA[
+    function keepSessionAlive() {
+        $.post("ping");
+    }
+    $(function() { window.setInterval("keepSessionAlive()", {{ config.PING_INTERVAL }}); });
+// ]]>
+</script>
+{% endif %}
 </body>
 </html>

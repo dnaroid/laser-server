@@ -1,16 +1,52 @@
 import re
-
-from flask import render_template, flash, redirect, url_for, request, g
+from flask import render_template, flash, redirect, url_for, request, g, session
 from flask_login import login_user, logout_user, current_user, login_required
-from app import app, db, lm
+from flask_sqlalchemy import get_debug_queries
+
+from app import app, db, lm, babel
+from config import LANGUAGES, DATABASE_QUERY_TIMEOUT
 from models import User, ROLE_USER, ROLE_ADMIN
-from datetime import datetime
+from datetime import datetime, timedelta
 from flask_babel import gettext as _
+
+# LOGIN_MESSAGE_CATEGORY = "danger"
+
+
+# @app.context_processor
+# def add_session_config():
+#     """Add current_app.permanent_session_lifetime converted to milliseconds
+#     to context. The config variable PERMANENT_SESSION_LIFETIME is not
+#     used because it could be either a timedelta object or an integer
+#     representing seconds.
+#     """
+#     return {
+#         'PERMANENT_SESSION_LIFETIME_MS': (
+#             app.permanent_session_lifetime.seconds * 1000),
+#     }
+
 
 
 @lm.user_loader
 def load_user(id):
+    # if 'email' not in session:
+    #     return None
     return User.query.get(int(id))
+
+
+@babel.localeselector
+def get_locale():
+    return request.accept_languages.best_match(LANGUAGES.keys())
+
+
+@app.errorhandler(404)
+def not_found_error(error):
+    return render_template('404.html'), 404
+
+
+@app.errorhandler(500)
+def internal_error(error):
+    db.session.rollback()
+    return render_template('500.html'), 500
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -23,6 +59,7 @@ def register():
     password2 = request.form['password2']
     email = request.form['email']
     u = User.query.filter_by(username=username).first()
+
     if len(username) < 4:
         flash(_('Name too short, 4 is minimal length!'), category='danger')
         return redirect(url_for('register'))
@@ -41,13 +78,14 @@ def register():
     if len(email) < 4:
         flash('Enter valid email!', category='danger')
         return redirect(url_for('register'))
+
     user = User(username=username, password=password, email=email,
                 role=ROLE_USER)
     db.session.add(user)
     db.session.commit()
     flash('Registration succesfull', category='success')
     login_user(user)
-    return redirect(url_for('index'))
+    return redirect(url_for('/'))
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -77,6 +115,19 @@ def before_request():
         g.user.last_seen = datetime.utcnow()
         db.session.add(g.user)
         db.session.commit()
+        # session.permanent = True
+        # app.permanent_session_lifetime = timedelta(seconds=10)
+
+
+# @app.after_request
+# def after_request(response):
+#     for query in get_debug_queries():
+#         if query.duration >= DATABASE_QUERY_TIMEOUT:
+#             app.logger.warning(
+#                     "SLOW QUERY: %s\nParameters: %s\nDuration: %fs\nContext: %s\n" %
+#                     (query.statement, query.parameters, query.duration,
+#                      query.context))
+#     return response
 
 
 @app.route('/')
@@ -89,6 +140,7 @@ def index():
 @app.route('/logout')
 def logout():
     logout_user()
+    flash('Logged out successfully', category='success')
     return redirect(url_for('index'))
 
 
@@ -98,6 +150,25 @@ def logout():
 def user(username, page=1):
     user = User.query.filter_by(username=username).first()
     if user is None:
-        flash('User ' + username + ' not found.', category='success')
+        flash('User ' + username + ' not found.', category='danger')
         return redirect(url_for('index'))
-    return render_template('user.html', last_seen="", user=user)
+    ls = user.last_seen
+    return render_template('user.html', last_seen=ls, user=user)
+
+
+@app.route('/room/<username>')
+@login_required
+def room(username):
+    session['has_room'] = True
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        flash('Room ' + username + ' not found.', category='danger')
+        return redirect(url_for('index'))
+    return render_template('room.html', user=user)
+
+
+@app.route('/ping', methods=['POST'])
+@login_required
+def ping():
+    session.modified = True
+    return

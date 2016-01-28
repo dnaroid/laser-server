@@ -1,35 +1,16 @@
 import re
 from flask import render_template, flash, redirect, url_for, request, g, session
 from flask_login import login_user, logout_user, current_user, login_required
-from flask_sqlalchemy import get_debug_queries
 
 from app import app, db, lm, babel
-from config import LANGUAGES, DATABASE_QUERY_TIMEOUT
+from config import LANGUAGES
 from models import User, ROLE_USER, ROLE_ADMIN
 from datetime import datetime, timedelta
 from flask_babel import gettext as _
 
-# LOGIN_MESSAGE_CATEGORY = "danger"
-
-
-# @app.context_processor
-# def add_session_config():
-#     """Add current_app.permanent_session_lifetime converted to milliseconds
-#     to context. The config variable PERMANENT_SESSION_LIFETIME is not
-#     used because it could be either a timedelta object or an integer
-#     representing seconds.
-#     """
-#     return {
-#         'PERMANENT_SESSION_LIFETIME_MS': (
-#             app.permanent_session_lifetime.seconds * 1000),
-#     }
-
-
 
 @lm.user_loader
 def load_user(id):
-    # if 'email' not in session:
-    #     return None
     return User.query.get(int(id))
 
 
@@ -115,19 +96,6 @@ def before_request():
         g.user.last_seen = datetime.utcnow()
         db.session.add(g.user)
         db.session.commit()
-        # session.permanent = True
-        # app.permanent_session_lifetime = timedelta(seconds=10)
-
-
-# @app.after_request
-# def after_request(response):
-#     for query in get_debug_queries():
-#         if query.duration >= DATABASE_QUERY_TIMEOUT:
-#             app.logger.warning(
-#                     "SLOW QUERY: %s\nParameters: %s\nDuration: %fs\nContext: %s\n" %
-#                     (query.statement, query.parameters, query.duration,
-#                      query.context))
-#     return response
 
 
 @app.route('/')
@@ -167,7 +135,7 @@ def room(username):
     return render_template('room.html', user=user)
 
 
-@app.route('/ping', methods=['POST'])
+@app.route('/ping', methods=['GET, POST'])
 @login_required
 def ping():
     session.modified = True

@@ -1,7 +1,6 @@
 from app import db
 from hashlib import md5
 
-
 ROLE_USER = 0
 ROLE_ADMIN = 1
 
@@ -14,13 +13,16 @@ class User(db.Model):
     role = db.Column(db.SmallInteger, default=ROLE_USER)
     last_seen = db.Column(db.DateTime)
 
+    @property
     def is_authenticated(self):
         return True
 
+    @property
     def is_active(self):
         return True
 
-    def is_anonymous():
+    @property
+    def is_anonymous(self):
         return False
 
     def get_id(self):
@@ -32,4 +34,3 @@ class User(db.Model):
 
     def __repr__(self):
         return '<User %r>' % (self.username)
-

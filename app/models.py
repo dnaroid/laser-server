@@ -12,6 +12,7 @@ class User(db.Model):
     email = db.Column(db.String(50), index=True, unique=True)
     role = db.Column(db.SmallInteger, default=ROLE_USER)
     last_seen = db.Column(db.DateTime)
+    # active = db.Column(db.)
 
     @property
     def is_authenticated(self):

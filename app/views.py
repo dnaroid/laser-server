@@ -101,7 +101,9 @@ def before_request():
 @app.route('/')
 @app.route('/index')
 def index():
-    users = User.query.all()
+    now = datetime.utcnow()
+    # users = User.query.all()
+    users = User.query.filter(now - User.last_seen > 100)
     return render_template('index.html', users=users)
 
 

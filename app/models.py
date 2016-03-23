@@ -27,7 +27,7 @@ class User(db.Model):
         return False
 
     def get_id(self):
-        return unicode(self.id)
+        return self.id
 
     def avatar(self, size):
         return 'http://www.gravatar.com/avatar/' + md5(

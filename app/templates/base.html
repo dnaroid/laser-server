@@ -13,7 +13,7 @@
     <nav class="navbar navbar-inverse">
         <div class="container-fluid">
             <div class="navbar-header">
-                <a class="navbar-brand" href="{{ url_for('index') }}"> LaserSq</a>
+                <a class="navbar-brand" href="{{ url_for('index') }}">LaserSq</a>
             </div>
             <ul class="nav navbar-nav">
                 <li><a href="{{ url_for('index') }}"> Home</a></li>
@@ -40,14 +40,14 @@
     {% block content %}{% endblock %}
 
 </div>
-{% if g.user.is_authenticated %}
-<script type="text/javascript">// <![CDATA[
-    function keepSessionAlive() {
-        $.post("ping");
-    }
-    $(function() { window.setInterval("keepSessionAlive()", {{ config.PING_INTERVAL }}); });
-// ]]>
-</script>
-{% endif %}
+<!--{% if g.user.is_authenticated %}-->
+<!--<script type="text/javascript">// <![CDATA[-->
+    <!--function keepSessionAlive() {-->
+        <!--$.post("ping");-->
+    <!--}-->
+    <!--$(function() { window.setInterval("keepSessionAlive()", {{ config.PING_INTERVAL }}); });-->
+<!--// ]]>-->
+<!--</script>-->
+<!--{% endif %}-->
 </body>
 </html>

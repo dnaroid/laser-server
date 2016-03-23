@@ -4,7 +4,7 @@ from flask_login import login_user, logout_user, current_user, login_required
 
 from app import app, db, lm, babel
 from config import LANGUAGES
-from models import User, ROLE_USER, ROLE_ADMIN
+from .models import User, ROLE_USER, ROLE_ADMIN
 from datetime import datetime, timedelta
 from flask_babel import gettext as _
 

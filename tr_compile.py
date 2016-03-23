@@ -1,4 +1,4 @@
-#!venv/bin/python
+#!env/bin/python
 import os
 
-os.system('babel compile -d app/translations')
+os.system('babel compile -d app/locale')

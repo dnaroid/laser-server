@@ -58,9 +58,9 @@ class News(db.Model):
     full_text = db.Column(db.String(2000))
     creation_date = db.Column(db.TIMESTAMP)
     modification_date = db.Column(db.Date)
-    # comments = db.relationship('comments',
-    #                            backref='comments',
-    #                            lazy='dynamic')
+    comments = db.relationship('comments',
+                               backref='comments',
+                               lazy='dynamic')
 
 
 class Role(db.Model):

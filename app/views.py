@@ -1,12 +1,13 @@
 import re
+from datetime import datetime
+
 from flask import render_template, flash, redirect, url_for, request, g, session
+from flask_babel import gettext as _
 from flask_login import login_user, logout_user, current_user, login_required
 
 from app import app, db, lm, babel
 from config import LANGUAGES
-from .models import User, ROLE_USER, ROLE_ADMIN
-from datetime import datetime, timedelta
-from flask_babel import gettext as _
+from .models import User
 
 
 @lm.user_loader

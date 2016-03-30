@@ -2,13 +2,13 @@
 Training. Pay attention that your application should be without view layer (UI).
 
 Your application should perform next operations:
-- Add news;
++ Add news;
 - Edit news;
 - Delete news;
-- View the list of news;
++ View the list of news;
 - View single news message;
 - Add news author;
-- Search according SearchCtiteria (see details in Implementation requirements section);
++ Search according SearchCtiteria (see details in Implementation requirements section);
 - Add tag/tags for news message;
 - Add comment(s) for news message;
 - Delete comment(s);

@@ -1,5 +1,21 @@
 from app import db
 
+news_tag = db.Table('news_tag',
+                    db.Column('tag_id',
+                              db.Integer,
+                              db.ForeignKey('tag.tag_id')),
+                    db.Column('news_id',
+                              db.Integer,
+                              db.ForeignKey('news.news_id')))
+
+news_author = db.Table('news_author',
+                       db.Column('author_id',
+                                 db.Integer,
+                                 db.ForeignKey('author.author_id')),
+                       db.Column('news_id',
+                                 db.Integer,
+                                 db.ForeignKey('news.news_id')))
+
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -21,10 +37,13 @@ class User(db.Model):
         return False
 
     def get_id(self):
-        return self.id
+        return self.user_id
+
+    def verify_password(self, passw):
+        return self.password == passw
 
     def __repr__(self):
-        return '<User %r>' % self.username
+        return '<User %r>' % self.user_name
 
 
 class Author(db.Model):
@@ -33,21 +52,24 @@ class Author(db.Model):
     author_name = db.Column(db.String(30), unique=True)
     expired = db.Column(db.TIMESTAMP)
 
+    def get_author_name(self):
+        return self.author_name
+
+    @staticmethod
+    def get_all_actual():
+        return Author.query.filter(Author.expired is not None).order_by(
+            'author_name')
+        # with_entities(Author.author_name).
+
 
 class Tag(db.Model):
     __tablename__ = 'tag'
     tag_id = db.Column(db.Integer, primary_key=True)
     tag_name = db.Column(db.String(30), unique=True)
 
-
-class Comments(db.Model):
-    __tablename__ = 'comments'
-    comment_id = db.Column(db.Integer, primary_key=True)
-    news_id = db.Column(db.Integer,
-                        db.ForeignKey('news.news_id', ondelete='CASCADE'),
-                        nullable=False)
-    comment_text = db.Column(db.String(100))
-    creation_date = db.Column(db.TIMESTAMP)
+    @staticmethod
+    def get_all():
+        return Tag.query.order_by('tag_name')
 
 
 class News(db.Model):
@@ -58,18 +80,66 @@ class News(db.Model):
     full_text = db.Column(db.String(2000))
     creation_date = db.Column(db.TIMESTAMP)
     modification_date = db.Column(db.Date)
-    comments = db.relationship('comments',
-                               backref='comments',
-                               lazy='dynamic')
+    comments = db.relationship('Comments', backref="author", lazy='dynamic')
+    author = db.relationship('Author', secondary=news_author,
+                             primaryjoin=(news_author.c.news_id == news_id),
+                             # secondaryjoin=(news_author.c.author_id),
+                             backref=db.backref('author', lazy='dynamic'),
+                             lazy='dynamic')
+    tags = db.relationship('Tag', secondary=news_tag,
+                           primaryjoin=(news_tag.c.news_id == news_id),
+                           # secondaryjoin=(news_tag.c.tag_id),
+                           backref=db.backref('tags', lazy='dynamic'),
+                           lazy='dynamic')
+
+    def get_comments(self):
+        return Comments.query.filter(Comments.news_id == self.news_id).all()
+
+    def get_comments_count(self):
+        return Comments.query.filter(Comments.news_id == self.news_id).count()
+
+    def get_author(self):
+        return Author.query.join(news_author, (
+            news_author.c.author_id == Author.author_id)).filter(
+            news_author.c.news_id == self.news_id).first()
+
+    def get_tags(self):
+        res = Tag.query \
+            .with_entities(Tag.tag_name) \
+            .join(news_tag, (news_tag.c.tag_id == Tag.tag_id)) \
+            .filter(news_tag.c.news_id == self.news_id).all()
+        return ', '.join(r[0] for r in res)
+
+    @staticmethod
+    def get_by_id(id):
+        return News.query.filter(News.news_id == id).first()
+
+
+class Comments(db.Model):
+    __tablename__ = 'comments'
+    comment_id = db.Column(db.Integer, primary_key=True)
+    news_id = db.Column(db.Integer, db.ForeignKey('news.news_id'))
+    comment_text = db.Column(db.String(100))
+    creation_date = db.Column(db.TIMESTAMP)
 
 
 class Role(db.Model):
     __tablename__ = 'roles'
-    user_id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'),
+                        primary_key=True)
     name = db.Column(db.String(50))
 
+    # class NewsTag(db.Model):
+    #     __tablename__ = 'news_tag'
+    #     db.Column(db.Integer, db.ForeignKey('tag.tag_id')),
+    #     db.Column(db.Integer, db.ForeignKey('news.news_id'))
+    #
+    # class NewsAuthor(db.Model):
+    #     __tablename__ = 'news_author'
+    #     db.Column(db.Integer, db.ForeignKey('author.author_id')),
+    #     db.Column(db.Integer, db.ForeignKey('news.news_id'))
 
-tags = db.Table('news_tags',
-                db.Column('tag_id', db.Integer, db.ForeignKey('tag.tag_id')),
-                db.Column('news_id', db.Integer, db.ForeignKey('news.news_id'))
-                )
+
+class Filter:
+    author = 0
+    tags = []

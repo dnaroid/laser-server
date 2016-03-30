@@ -1,18 +1,48 @@
-import re
-from datetime import datetime
+from flask import render_template, flash, redirect, url_for, request, session
+from sqlalchemy import func
 
-from flask import render_template, flash, redirect, url_for, request, g, session
-from flask_babel import gettext as _
-from flask_login import login_user, logout_user, current_user, login_required
-
-from app import app, db, lm, babel
-from config import LANGUAGES
-from .models import User
+from app import app, db, babel
+from app.forms import AddNewsForm, FilterForm
+from app.models import News, news_author, Author, Tag, news_tag
+from config import LANGUAGES, NEWS_PER_PAGE
 
 
-@lm.user_loader
-def load_user(id):
-    return User.query.get(int(id))
+# @app.route('/login', methods=['GET', 'POST'])
+# def login():
+#     form = LoginForm()
+#     if form.is_submitted() and form.validate:
+#         user = User.query.filter_by(login=form.login.data).first()
+#         if user is not None and user.verify_password(form.password.data):
+#             login_user(user, form.remember_me.data)
+#             flash('Logged in successfully', category='success')
+#             return redirect(request.args.get('next') or url_for('index'))
+#         flash('Invalid username or password.', category='error')
+#     return render_template('login.html', form=form)
+
+
+@app.route('/add_news', methods=['GET', 'POST'])
+def add_news():
+    form = AddNewsForm()
+    if form.is_submitted() and form.validate:
+        news = News(title=form.title.data, short_text=form.short_text.data,
+                    full_text=form.full_text.data,
+                    creation_date=func.current_timestamp())
+        db.session.add(news)
+        db.session.commit()
+        flash('News added successfully', category='success')
+        return redirect(request.args.get('next') or url_for('index'))
+    return render_template('add_news.html', form=form)
+
+
+# @app.route('/list_news', methods=['GET', 'POST'])
+# def list_news():
+#     list = News.query.order_by(News.creation_date)
+#     return render_template('index.html', list=list)
+
+
+# @lm.user_loader
+# def load_user(id):
+#     return User.query.get(int(id))
 
 
 @babel.localeselector
@@ -31,115 +61,120 @@ def internal_error(error):
     return render_template('500.html'), 500
 
 
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    if request.method == 'GET':
-        return render_template('register.html')
-    username = request.form['username']
-    username = re.sub('[^a-zA-Z0-9_\.]', '', username)
-    password = request.form['password']
-    password2 = request.form['password2']
-    email = request.form['email']
-    u = User.query.filter_by(username=username).first()
-
-    if len(username) < 4:
-        flash(_('Name too short, 4 is minimal length!'), category='danger')
-        return redirect(url_for('register'))
-    if u is not None:
-        flash(_('Nickname aleady in use!'), category='danger')
-        return redirect(url_for('register'))
-    if len(password) < 4:
-        flash('Password too short, 4 is minimal length!', category='danger')
-        return redirect(url_for('register'))
-    if len(password) > 10:
-        flash('Password too long, 10 is maximal length!', category='danger')
-        return redirect(url_for('register'))
-    if password != password2:
-        flash('Check password error!', category='danger')
-        return redirect(url_for('register'))
-    if len(email) < 4:
-        flash('Enter valid email!', category='danger')
-        return redirect(url_for('register'))
-
-    user = User(username=username, password=password, email=email,
-                role=ROLE_USER)
-    db.session.add(user)
-    db.session.commit()
-    flash('Registration succesfull', category='success')
-    login_user(user)
-    return redirect(url_for('/'))
-
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'GET':
-        return render_template('login.html')
-
-    username = request.form['username']
-    password = request.form['password']
-    remember_me = False
-    if 'remember_me' in request.form:
-        remember_me = True
-    registered_user = User.query.filter_by(username=username,
-                                           password=password).first()
-    if registered_user is None:
-        flash('Username or Password is invalid', 'danger')
-        return redirect(url_for('login'))
-    login_user(registered_user, remember=remember_me)
-    flash('Logged in successfully', category='success')
-    return redirect(request.args.get('next') or url_for('index'))
+# @app.route('/register', methods=['GET', 'POST'])
+# def register():
+#     if request.method == 'GET':
+#         return render_template('register.html')
+#     username = request.form['username']
+#     username = re.sub('[^a-zA-Z0-9_\.]', '', username)
+#     password = request.form['password']
+#     password2 = request.form['password2']
+#     email = request.form['email']
+#     u = User.query.filter_by(username=username).first()
+#
+#     if len(username) < 4:
+#         flash(_('Name too short, 4 is minimal length!'), category='danger')
+#         return redirect(url_for('register'))
+#     if u is not None:
+#         flash(_('Nickname aleady in use!'), category='danger')
+#         return redirect(url_for('register'))
+#     if len(password) < 4:
+#         flash('Password too short, 4 is minimal length!', category='danger')
+#         return redirect(url_for('register'))
+#     if len(password) > 10:
+#         flash('Password too long, 10 is maximal length!', category='danger')
+#         return redirect(url_for('register'))
+#     if password != password2:
+#         flash('Check password error!', category='danger')
+#         return redirect(url_for('register'))
+#     if len(email) < 4:
+#         flash('Enter valid email!', category='danger')
+#         return redirect(url_for('register'))
+#
+#     user = User(username=username, password=password, email=email)
+#     db.session.add(user)
+#     db.session.commit()
+#     flash('Registration succesfull', category='success')
+#     login_user(user)
+#     return redirect(url_for('/'))
 
 
-@app.before_request
-def before_request():
-    g.user = current_user
-    if g.user.is_authenticated:
-        g.user.last_seen = datetime.utcnow()
-        db.session.add(g.user)
-        db.session.commit()
+# @app.before_request
+# def before_request():
+#     g.user = current_user
 
 
-@app.route('/')
-@app.route('/index')
-def index():
-    now = datetime.utcnow()
-    # users = User.query.all()
-    users = User.query.filter(now - User.last_seen > 100)
-    return render_template('index.html', users=users)
+# @app.route('/logout')
+# def logout():
+#     logout_user()
+#     flash('Logged out successfully', category='success')
+#     return redirect(url_for('index'))
 
 
-@app.route('/logout')
-def logout():
-    logout_user()
-    flash('Logged out successfully', category='success')
-    return redirect(url_for('index'))
+# @app.route('/user/<username>')
+# @app.route('/user/<username>/<int:page>')
+# @login_required
+# def user(username, page=1):
+#     user = User.query.filter_by(user_name=username).first()
+#     if user is None:
+#         flash('User ' + username + ' not found.', category='danger')
+#         return redirect(url_for('index'))
+#     return render_template('user.html', user=user)
 
 
-@app.route('/user/<username>')
-@app.route('/user/<username>/<int:page>')
-@login_required
-def user(username, page=1):
-    user = User.query.filter_by(username=username).first()
-    if user is None:
-        flash('User ' + username + ' not found.', category='danger')
-        return redirect(url_for('index'))
-    ls = user.last_seen
-    return render_template('user.html', last_seen=ls, user=user)
+@app.route('/news/<string:back>/<int:id>', methods=['GET', 'POST'])
+def show_news(id, back):
+    news = News.get_by_id(id)
+    return render_template('show_news.html', news=news, back=back)
 
 
-@app.route('/room/<username>')
-@login_required
-def room(username):
-    session['has_room'] = True
-    user = User.query.filter_by(username=username).first()
-    if user is None:
-        flash('Room ' + username + ' not found.', category='danger')
-        return redirect(url_for('index'))
-    return render_template('room.html', user=user)
+# news list
+@app.route('/', methods=['GET', 'POST'])
+@app.route('/index', methods=['GET', 'POST'])
+@app.route('/index/<int:page>', methods=['GET', 'POST'])
+def index(page=1):
+    form = FilterForm()
+    if 'author' not in session.keys():
+        session['author'] = '0'
+    if 'tags' not in session.keys():
+        session['tags'] = []
+    args = request.args
+    if 'reset' in args.keys():
+        session['author'] = '0'
+        session['tags'] = []
+    elif 'filter' in args.keys():
+        session['author'] = args['author']
+        session['tags'] = [int(t) for t in args.getlist('tags')]
+    return render_template('index.html', list=get_news_page(page), form=form,
+                           authors=Author.get_all_actual(), tags=Tag.get_all(),
+                           sel_tags=session['tags'],
+                           author=int(session['author']))
 
 
-@app.route('/ping', methods=['GET, POST'])
-@login_required
-def ping():
-    session.modified = True
-    return
+def get_news_page(page):
+    no_author = session['author'] == '0'
+    no_tags = session['tags'] == []
+    if no_author and no_tags:  # no filters
+        return News.query \
+            .order_by(News.creation_date) \
+            .paginate(page, NEWS_PER_PAGE, False)
+    if no_tags:  # only author filter
+        return News.query \
+            .join(news_author, (news_author.c.news_id == News.news_id)) \
+            .filter(news_author.c.author_id == session['author']) \
+            .order_by(News.creation_date) \
+            .paginate(page, NEWS_PER_PAGE, False)
+    if no_author:  # only tag filter
+        return News.query \
+            .join(news_tag, (news_tag.c.news_id == News.news_id)) \
+            .filter(news_tag.c.tag_id.in_(session['tags'])) \
+            .order_by(News.creation_date) \
+            .paginate(page, NEWS_PER_PAGE, False)
+    # author & tag filters
+    return News.query \
+        .join(news_author, (news_author.c.news_id == News.news_id)) \
+        .filter(news_author.c.author_id == session['author']) \
+        .join(news_tag, (news_tag.c.news_id == News.news_id)) \
+        .filter(news_tag.c.tag_id.in_(session['tags'])) \
+        .order_by(News.creation_date) \
+        .paginate(page, NEWS_PER_PAGE, False)

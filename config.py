@@ -15,8 +15,6 @@ if os.environ.get('DATABASE_URL') is None:
                                '?check_same_thread=False')
 else:
     SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
-# jdbc:oracle:thin:@localhost:1521:xe
-# SQLALCHEMY_DATABASE_URI = 'mysql://root:root@localhost/test'
 SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'db_repository')
 SQLALCHEMY_TRACK_MODIFICATIONS = True
 
@@ -29,10 +27,7 @@ LANGUAGES = {
 # slow database query threshold (in seconds)
 DATABASE_QUERY_TIMEOUT = 0.5
 
-PING_INTERVAL = 5000
-# PERMANENT_SESSION_LIFETIME = datetime.timedelta(seconds=10)
 # os.environ.get('HEROKU')
 
 # pagination
-POSTS_PER_PAGE = 50
-MAX_SEARCH_RESULTS = 50
+NEWS_PER_PAGE = 5

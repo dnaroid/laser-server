@@ -59,7 +59,6 @@ class Author(db.Model):
     def get_all_actual():
         return Author.query.filter(Author.expired is not None).order_by(
             'author_name')
-        # with_entities(Author.author_name).
 
 
 class Tag(db.Model):
@@ -128,18 +127,3 @@ class Role(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'),
                         primary_key=True)
     name = db.Column(db.String(50))
-
-    # class NewsTag(db.Model):
-    #     __tablename__ = 'news_tag'
-    #     db.Column(db.Integer, db.ForeignKey('tag.tag_id')),
-    #     db.Column(db.Integer, db.ForeignKey('news.news_id'))
-    #
-    # class NewsAuthor(db.Model):
-    #     __tablename__ = 'news_author'
-    #     db.Column(db.Integer, db.ForeignKey('author.author_id')),
-    #     db.Column(db.Integer, db.ForeignKey('news.news_id'))
-
-
-class Filter:
-    author = 0
-    tags = []

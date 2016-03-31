@@ -65,32 +65,7 @@ def internal_error(error):
 # def register():
 #     if request.method == 'GET':
 #         return render_template('register.html')
-#     username = request.form['username']
-#     username = re.sub('[^a-zA-Z0-9_\.]', '', username)
-#     password = request.form['password']
-#     password2 = request.form['password2']
-#     email = request.form['email']
-#     u = User.query.filter_by(username=username).first()
-#
-#     if len(username) < 4:
-#         flash(_('Name too short, 4 is minimal length!'), category='danger')
-#         return redirect(url_for('register'))
-#     if u is not None:
-#         flash(_('Nickname aleady in use!'), category='danger')
-#         return redirect(url_for('register'))
-#     if len(password) < 4:
-#         flash('Password too short, 4 is minimal length!', category='danger')
-#         return redirect(url_for('register'))
-#     if len(password) > 10:
-#         flash('Password too long, 10 is maximal length!', category='danger')
-#         return redirect(url_for('register'))
-#     if password != password2:
-#         flash('Check password error!', category='danger')
-#         return redirect(url_for('register'))
-#     if len(email) < 4:
-#         flash('Enter valid email!', category='danger')
-#         return redirect(url_for('register'))
-#
+#     todo
 #     user = User(username=username, password=password, email=email)
 #     db.session.add(user)
 #     db.session.commit()

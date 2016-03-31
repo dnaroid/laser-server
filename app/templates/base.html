@@ -9,7 +9,7 @@
     <script type="text/javascript" src="/static/js/jquery.min.js"></script>
     <script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="/static/js/bootstrap-multiselect.js"></script>
-    <title> News portal </title>
+    <title> News portal - Administration </title>
 </head>
 <body>
 <wrapper>
@@ -17,7 +17,20 @@
     {% include "navigation.html" %}
 
     <content>
-        {% block content %}{% endblock %}
+
+        <table width="100%">
+            <tr>
+                {% if g.user.is_authenticated %}
+                    <td width="200">
+                        {% include "menu.html" %}
+                    </td>
+
+                {% endif %}
+                <td>
+                    {% block content %}{% endblock %}
+                </td>
+            </tr>
+        </table>
     </content>
 
     <footer>

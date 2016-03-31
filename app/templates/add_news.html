@@ -1,14 +1,38 @@
 {% extends "base.html" %}
 {% block content %}
-<div>
-    <h1>Add News</h1>
-</div>
-<div>
-    <form action="" method="post" name="add_news">
-        {{form.title.label}}:<br>{{form.title}}<br>
-        {{form.short_text.label}}:<br>{{form.short_text(size=57)}}<br>
-        {{form.full_text.label}}:<br>{{form.full_text(cols="59", rows="20")}}<br>
-        {{form.submit}}<br>
-    </form>
-</div>
+    <div align="center">
+        <form action="" method="post" name="add_news">
+            <table>
+                <tr>
+                    <td>
+                        {{ form.title.label }}:
+                    </td>
+                    <td>
+                        {{ form.title }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        {{ form.short_text.label }}:
+                    </td>
+                    <td>
+                        {{ form.short_text(size=57) }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        {{ form.full_text.label }}:
+                    </td>
+                    <td>
+                        {{ form.full_text(cols="59", rows="20") }}</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>
+                        {{ form.submit }}
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
 {% endblock %}

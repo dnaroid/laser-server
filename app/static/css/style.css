@@ -35,18 +35,6 @@ footer {
     margin: 0 auto;
 }
 
-/*.paginate a {*/
-/*color: #333;*/
-/*padding: 0 .7em;*/
-/*text-decoration: none;*/
-/*border: solid 1px #666;*/
-/*border-radius: 3px;*/
-/*}*/
-
-/*.paginate a:hover {*/
-/*background-color: #fff;*/
-/*}*/
-
 .paginate a[href="#"] {
     background-color: #333;
     color: #fff;
@@ -87,4 +75,19 @@ footer {
 
 .comment-text {
     background-color: #eee;
+}
+
+.login-form {
+    padding-top: 5em;
+}
+
+.login-form td {
+    padding: .2em;
+}
+
+.menu {
+    position: fixed;
+    top: 8em;
+    border: solid black 1px;
+    padding: .5em;
 }

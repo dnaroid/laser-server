@@ -1,21 +1,45 @@
 <div class="navigation">
     <table>
         <tr>
-            <td width="100%">
-                <a href="{{ url_for('index') }}">
-                    <h2>News portal</h2>
-                </a>
-            </td>
+
+            {% if g.user.is_authenticated %}
+                <td width="100%">
+                    <a href="{{ url_for('index') }}">
+                        <h2>News portal - Administration </h2>
+                    </a>
+                </td>
+
+                <td>
+                    <a href="{{ url_for('logout') }}" class="btn btn-xs btn-default">
+                        Logout
+                    </a>
+                </td>
+            {% else %}
+                <td width="100%">
+                    <a href="{{ url_for('index') }}">
+                        <h2>News portal </h2>
+                    </a>
+                </td>
+                <td>
+                    <a href="{{ url_for('login') }}" class="btn btn-xs btn-default">
+                        Login
+                    </a>
+                </td>
+            {% endif %}
+
+
             <td>
                 <a href="#" class="btn btn-xs btn-default">
                     EN
                 </a>
             </td>
+
             <td>
                 <a href="#" class="btn btn-xs btn-default">
                     RU
                 </a>
             </td>
+
         </tr>
     </table>
 </div>

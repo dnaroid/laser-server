@@ -1,17 +1,31 @@
 {% extends "base.html" %}
 {% block content %}
-<div>
-    <h1>Login</h1>
-</div>
-<div>
-    <form action="" method="post" name="login">
-        {{form.login.label}}:<br>
-        {{form.login}}<br>
-        {{form.password.label}}:<br>
-        {{form.password}}<br>
-        {{form.remember_me.label}}
-        {{form.remember_me}}<br>
-        {{form.submit}}<br>
-    </form>
-</div>
+    <div align="center">
+        <form action="" method="post" name="login" class="login-form">
+            <table>
+                <tr>
+                    <td>
+                        {{ form.login.label }}:
+                    </td>
+                    <td>
+                        {{ form.login }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        {{ form.password.label }}:
+                    </td>
+                    <td>
+                        {{ form.password }}
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td class="right-align">
+                        {{ form.submit }}
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
 {% endblock %}

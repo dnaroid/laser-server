@@ -1,23 +1,22 @@
-from flask import render_template, flash, redirect, url_for, request, session
+from flask import render_template, flash, redirect, url_for, request, session, g
+from flask.ext.login import login_user, logout_user, current_user
 from sqlalchemy import func
 
-from app import app, db, babel
-from app.forms import AddNewsForm, FilterForm, CommentForm
-from app.models import News, news_author, Author, Tag, news_tag, Comments
+from app import app, db, babel, lm
+from app.forms import AddNewsForm, FilterForm, CommentForm, LoginForm
+from app.models import News, news_author, Author, Tag, news_tag, Comments, User
 from config import LANGUAGES, NEWS_PER_PAGE
 
 
-# @app.route('/login', methods=['GET', 'POST'])
-# def login():
-#     form = LoginForm()
-#     if form.is_submitted() and form.validate:
-#         user = User.query.filter_by(login=form.login.data).first()
-#         if user is not None and user.verify_password(form.password.data):
-#             login_user(user, form.remember_me.data)
-#             flash('Logged in successfully', category='success')
-#             return redirect(request.args.get('next') or url_for('index'))
-#         flash('Invalid username or password.', category='error')
-#     return render_template('login.html', form=form)
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+    if form.is_submitted() and form.validate:
+        user = User.query.filter_by(login=form.login.data).first()
+        if user is not None and user.verify_password(form.password.data):
+            login_user(user, form.remember_me.data)
+            return redirect(url_for('index'))
+    return render_template('login.html', form=form)
 
 
 @app.route('/add_news', methods=['GET', 'POST'])
@@ -29,20 +28,13 @@ def add_news():
                     creation_date=func.current_timestamp())
         db.session.add(news)
         db.session.commit()
-        flash('News added successfully', category='success')
         return redirect(request.args.get('next') or url_for('index'))
     return render_template('add_news.html', form=form)
 
 
-# @app.route('/list_news', methods=['GET', 'POST'])
-# def list_news():
-#     list = News.query.order_by(News.creation_date)
-#     return render_template('index.html', list=list)
-
-
-# @lm.user_loader
-# def load_user(id):
-#     return User.query.get(int(id))
+@lm.user_loader
+def load_user(id):
+    return User.query.get(int(id))
 
 
 @babel.localeselector
@@ -69,32 +61,19 @@ def internal_error(error):
 #     user = User(username=username, password=password, email=email)
 #     db.session.add(user)
 #     db.session.commit()
-#     flash('Registration succesfull', category='success')
 #     login_user(user)
 #     return redirect(url_for('/'))
 
 
-# @app.before_request
-# def before_request():
-#     g.user = current_user
+@app.before_request
+def before_request():
+    g.user = current_user
 
 
-# @app.route('/logout')
-# def logout():
-#     logout_user()
-#     flash('Logged out successfully', category='success')
-#     return redirect(url_for('index'))
-
-
-# @app.route('/user/<username>')
-# @app.route('/user/<username>/<int:page>')
-# @login_required
-# def user(username, page=1):
-#     user = User.query.filter_by(user_name=username).first()
-#     if user is None:
-#         flash('User ' + username + ' not found.', category='danger')
-#         return redirect(url_for('index'))
-#     return render_template('user.html', user=user)
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
 
 
 @app.route('/news/<string:back>/<int:id>', methods=['GET', 'POST'])

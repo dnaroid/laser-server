@@ -38,6 +38,25 @@
                     </td>
                 </tr>
             {% endfor %}
+            <tr>
+                <td>
+                    <form action="" method="post" name="comment">
+                        {{ form.text(cols="100", rows="5") }}
+                        <div class="right-align">
+                            {{ form.submit(class="right-align") }}
+                        </div>
+                    </form>
+                </td>
+            </tr>
+            <tr>
+                <td class="left-align">
+                    <a href="#">PREVIOUS</a>
+                </td>
+                <td></td>
+                <td class="right-align">
+                    <a href="#">NEXT</a>
+                </td>
+            </tr>
         </table>
     </div>
 {% endblock %}

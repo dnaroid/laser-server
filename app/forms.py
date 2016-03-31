@@ -23,3 +23,9 @@ class AddNewsForm(Form):
 class FilterForm(Form):
     filter = SubmitField('Filter')
     reset = SubmitField('Reset')
+
+
+class CommentForm(Form):
+    text = TextAreaField('text',
+                         validators=[DataRequired, Length(2, 100)])
+    submit = SubmitField('Post comment')

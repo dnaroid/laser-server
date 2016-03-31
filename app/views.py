@@ -2,8 +2,8 @@ from flask import render_template, flash, redirect, url_for, request, session
 from sqlalchemy import func
 
 from app import app, db, babel
-from app.forms import AddNewsForm, FilterForm
-from app.models import News, news_author, Author, Tag, news_tag
+from app.forms import AddNewsForm, FilterForm, CommentForm
+from app.models import News, news_author, Author, Tag, news_tag, Comments
 from config import LANGUAGES, NEWS_PER_PAGE
 
 
@@ -99,8 +99,15 @@ def internal_error(error):
 
 @app.route('/news/<string:back>/<int:id>', methods=['GET', 'POST'])
 def show_news(id, back):
+    form = CommentForm()
     news = News.get_by_id(id)
-    return render_template('show_news.html', news=news, back=back)
+    if form.is_submitted() and len(form.text.data) > 2:
+        comment = Comments(news_id=id, comment_text=form.text.data,
+                           creation_date=func.current_timestamp())
+        db.session.add(comment)
+        db.session.commit()
+        form.text.data = ''
+    return render_template('show_news.html', news=news, back=back, form=form)
 
 
 # news list
@@ -129,17 +136,20 @@ def index(page=1):
 def get_news_page(page):
     no_author = session['author'] == '0'
     no_tags = session['tags'] == []
-    if no_author and no_tags:  # no filters
+    # no filters
+    if no_author and no_tags:
         return News.query \
             .order_by(News.creation_date) \
             .paginate(page, NEWS_PER_PAGE, False)
-    if no_tags:  # only author filter
+    # author filter only
+    if no_tags:
         return News.query \
             .join(news_author, (news_author.c.news_id == News.news_id)) \
             .filter(news_author.c.author_id == session['author']) \
             .order_by(News.creation_date) \
             .paginate(page, NEWS_PER_PAGE, False)
-    if no_author:  # only tag filter
+    # tag filter only
+    if no_author:
         return News.query \
             .join(news_tag, (news_tag.c.news_id == News.news_id)) \
             .filter(news_tag.c.tag_id.in_(session['tags'])) \

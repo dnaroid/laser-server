@@ -1,44 +1,52 @@
+{% extends "base.html" %}
 {% block content %}
-    <script type="text/javascript">
-        $(document).ready(function () {
-            $('.multi-select').multiselect();
-        });
-    </script>
-    <div class="news-table">
+
+
+    <div align="center" id="div_form_filter">
+        <form id="form_filter">
+
+            <select id="select_author" name="author"> </select>
+
+            <select id="select_tags" name="t" style="display: none" multiple> </select>
+
+            <input id="button_filter" type="button" value="Filter">
+            <input id="button_reset" type="button" value="Reset">
+
+        </form>
+    </div>
+
+    <div id="div_news_list">
+        <table id="news_table">
+        </table>
+    </div>
+
+    <div id="div_pagination" align="center">
+    </div>
+
+
+    {#    <div class="news-table">
         <table>
             <tr>
                 <td colspan="3">
                     <div class="center-align">
-                        <form method="get" name="filter">
+                        #}{#  filter  #}{#
+                        <form id="form_filter">
 
-                            <select name="author" class="btn btn-default multi-select">
-                                <option label="Select the author" value="0"></option>
-                                {% for a in authors %}
-                                    <option label="{{ a.author_name }}"
-                                            value="{{ a.author_id }}"
-                                            {% if a.author_id == author %} selected {% endif %}
-                                    >
-                                    </option>
-                                {% endfor %}
+                            <select id="select_author" name="author">
                             </select>
 
-                            <select name="tags" class="btn btn-default multi-select" multiple>
-                                <option label="Select tags" value="0" disabled></option>
-                                {% for t in tags %}
-                                    <option label="{{ t.tag_name }}"
-                                            value="{{ t.tag_id }}"
-                                            {% if t.tag_id in sel_tags %} selected {% endif %}
-                                    >
-                                    </option>
-                                {% endfor %}
+                            <select id="select_tags" name="t" style="display: none" multiple>
                             </select>
 
-                            {{ form.filter(class="btn btn-default") }}
-                            {{ form.reset(class="btn btn-default") }}
+                            <input id="button_filter" class="" type="button" value="Filter">
+                            <input id="button_reset" class="" type="button" value="Reset">
+
                         </form>
                     </div>
+
                 </td>
             </tr>
+            #}{# news list #}{#
             {% if list %}
                 {% for news in list.items %}
                     <tr>
@@ -57,20 +65,41 @@
                     </tr>
                     <tr>
                         <td colspan="3" class="right-align">
-            <span class="tags-list">
-                            {{ news.get_tags() }}
+                            <span class="tags-list">
+                                {{ news.get_tags() }}
                             </span>
-            <span class="comments-count">
+
+                            <span class="comments-count">
                             Comments({{ news.get_comments_count() }})
                             </span>
-                            <a href="{{ url_for('show_news',back=list.page, id=news.news_id) }}">View</a>
+
+                            {% if admin %}
+
+                                <a href="{{ url_for('edit_news', back=list.page, id=news.news_id) }}">Edit</a>
+
+                                <input type="checkbox" id="{{ news.news_id }}">
+
+                            {% else %}
+                                <a href="{{ url_for('show_news', back=list.page, id=news.news_id) }}">View</a>
+                            {% endif %}
                         </td>
                     </tr>
                 {% endfor %}
+
+                {% if admin %}
+                    <tr>
+                        <td colspan="3" class="right-align">
+                            <input type="button" value="Delete" id="submit">
+                        </td>
+                    </tr>
+                {% endif %}
+
                 <tr>
                 <td colspan="3">
+
+                #}{# pagination #}{#
                 <div class="paginate">
-                {%- for page in list.iter_pages() %}
+                {% for page in list.iter_pages() %}
                     {% if page %}
                         {% if page != list.page %}
                             <a href="{{ url_for('index', page=page) }}"
@@ -81,11 +110,13 @@
                     {% else %}
                         <span class=ellipsis>…</span>
                     {% endif %}
-                {%- endfor %}
+                {% endfor %}
+
             {% endif %}
             </div>
             </td>
             </tr>
         </table>
-    </div>
+    </div>#}
+
 {% endblock %}

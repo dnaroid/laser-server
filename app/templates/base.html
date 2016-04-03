@@ -9,9 +9,12 @@
     <script type="text/javascript" src="/static/js/jquery.min.js"></script>
     <script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="/static/js/bootstrap-multiselect.js"></script>
-    <title> News portal - Administration </title>
+    <script type="text/javascript" src="/static/js/jquery.cookie.js"></script>
+    <script type="text/javascript" src="/static/js/service.js"></script>
+    <title> News portal</title>
 </head>
 <body>
+{% set admin = g.user.is_authenticated %}
 <wrapper>
 
     {% include "navigation.html" %}
@@ -20,14 +23,16 @@
 
         <table width="100%">
             <tr>
-                {% if g.user.is_authenticated %}
+                {% if admin %}
                     <td width="200">
                         {% include "menu.html" %}
                     </td>
 
                 {% endif %}
                 <td>
-                    {% block content %}{% endblock %}
+                    <div id="div_content">
+                        {% block content %}{% endblock %}
+                    </div>
                 </td>
             </tr>
         </table>

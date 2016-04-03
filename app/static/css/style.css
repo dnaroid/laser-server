@@ -28,18 +28,6 @@ footer {
     width: 100%;
 }
 
-.paginate {
-    text-align: center;
-    background-color: #eeeeee;
-    padding: 1em 0;
-    margin: 0 auto;
-}
-
-.paginate a[href="#"] {
-    background-color: #333;
-    color: #fff;
-}
-
 .nondeco {
     text-decoration: none;
     color: #55f;
@@ -53,7 +41,7 @@ footer {
     color: #f66;
 }
 
-.tags-list {
+.tags-text {
     color: #666;
 }
 
@@ -63,14 +51,6 @@ footer {
 
 .center-align {
     text-align: center;
-}
-
-.news-table table {
-    width: 100%;
-}
-
-.news-table td {
-    padding: .5em;
 }
 
 .comment-text {
@@ -89,5 +69,42 @@ footer {
     position: fixed;
     top: 8em;
     border: solid black 1px;
+    padding: .5em;
+}
+
+#div_form_filter {
+    display: table;
+    margin: 0 auto;
+    width: 100%;
+}
+
+#div_form_filter > * {
+    margin: .5em;
+}
+
+#news_table {
+    width: 100%;
+}
+
+#news_table td {
+    /*border: black 1px solid;*/
+    padding: .5em;
+}
+
+#div_pagination {
+    padding: 1em;
+    background-color: #efefef;
+}
+
+#div_pagination * {
+    margin: 2px;
+}
+
+#div_pagination .current {
+    background-color: #333;
+    color: #fff;
+}
+
+span {
     padding: .5em;
 }

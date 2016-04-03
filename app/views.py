@@ -1,9 +1,11 @@
-from flask import render_template, flash, redirect, url_for, request, session, g
-from flask.ext.login import login_user, logout_user, current_user
+from flask import render_template, redirect, url_for, request, g, \
+    jsonify
+from flask.ext.login import login_user, logout_user, current_user, \
+    login_required
 from sqlalchemy import func
 
 from app import app, db, babel, lm
-from app.forms import AddNewsForm, FilterForm, CommentForm, LoginForm
+from app.forms import AddNewsForm, CommentForm, LoginForm
 from app.models import News, news_author, Author, Tag, news_tag, Comments, User
 from config import LANGUAGES, NEWS_PER_PAGE
 
@@ -20,7 +22,28 @@ def login():
 
 
 @app.route('/add_news', methods=['GET', 'POST'])
+@login_required
 def add_news():
+    form = AddNewsForm()
+    if form.is_submitted() and form.validate:
+        news = News(title=form.title.data, short_text=form.short_text.data,
+                    full_text=form.full_text.data,
+                    creation_date=func.current_timestamp())
+        db.session.add(news)
+        db.session.commit()
+        return redirect(request.args.get('next') or url_for('index'))
+    return render_template('add_news.html', form=form)
+
+
+@app.route('/del_news', methods=['GET', 'POST'])
+@login_required
+def delete_news():
+    return render_template('index.html')
+
+
+@app.route('/edit_news', methods=['GET', 'POST'])
+@login_required
+def edit_news():
     form = AddNewsForm()
     if form.is_submitted() and form.validate:
         news = News(title=form.title.data, short_text=form.short_text.data,
@@ -89,32 +112,67 @@ def show_news(id, back):
     return render_template('show_news.html', news=news, back=back, form=form)
 
 
+@app.route('/_get_all_tags')
+def _get_all_tags():
+    return jsonify(Tag.get_all_list())
+
+
+@app.route('/_get_all_authors')
+def _get_all_authors():
+    return jsonify(Author.get_all_actual_list())
+
+
+@app.route('/_get_news')
+@app.route('/_get_news/<int:page>')
+def _get_news(page=0):
+    pagin = get_news_page(page)
+    items = pagin.items
+    pages = pagin.pages
+    page = pagin.page
+    res = {
+        'pagination': {
+            'pages': pages,
+            'page': page
+        }}
+    for news in items:
+        res[str(news.news_id)] = {
+            'id': news.news_id,
+            'title': news.title,
+            'author': news.get_author().author_name,
+            'short': news.short_text,
+            'tags': news.get_tags(),
+            'comments': news.get_comments_count(),
+            'date': news.creation_date,
+        }
+
+    return jsonify(res)
+
+
 # news list
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
 @app.route('/index/<int:page>', methods=['GET', 'POST'])
 def index(page=1):
-    form = FilterForm()
-    if 'author' not in session.keys():
-        session['author'] = '0'
-    if 'tags' not in session.keys():
-        session['tags'] = []
-    args = request.args
-    if 'reset' in args.keys():
-        session['author'] = '0'
-        session['tags'] = []
-    elif 'filter' in args.keys():
-        session['author'] = args['author']
-        session['tags'] = [int(t) for t in args.getlist('tags')]
-    return render_template('index.html', list=get_news_page(page), form=form,
-                           authors=Author.get_all_actual(), tags=Tag.get_all(),
-                           sel_tags=session['tags'],
-                           author=int(session['author']))
+    return render_template('index.html')
 
 
-def get_news_page(page):
-    no_author = session['author'] == '0'
-    no_tags = session['tags'] == []
+def get_news_page(page=0):
+    print(request.cookies['author'])
+    print(request.cookies['tags'])
+    a = request.cookies['author']
+    if a != '':
+        author = a.split('%3D')[1]
+    else:
+        author = 0
+    t = request.cookies['tags']
+    if t != '':
+        tags = t.replace('%26', '').split('t%3D')
+    else:
+        tags = ''
+    print(author)
+    print(tags)
+    no_author = author == '0'
+    no_tags = len(tags) == 0
     # no filters
     if no_author and no_tags:
         return News.query \
@@ -124,21 +182,21 @@ def get_news_page(page):
     if no_tags:
         return News.query \
             .join(news_author, (news_author.c.news_id == News.news_id)) \
-            .filter(news_author.c.author_id == session['author']) \
+            .filter(news_author.c.author_id == author) \
             .order_by(News.creation_date) \
             .paginate(page, NEWS_PER_PAGE, False)
     # tag filter only
     if no_author:
         return News.query \
             .join(news_tag, (news_tag.c.news_id == News.news_id)) \
-            .filter(news_tag.c.tag_id.in_(session['tags'])) \
+            .filter(news_tag.c.tag_id.in_(tags)) \
             .order_by(News.creation_date) \
             .paginate(page, NEWS_PER_PAGE, False)
     # author & tag filters
     return News.query \
         .join(news_author, (news_author.c.news_id == News.news_id)) \
-        .filter(news_author.c.author_id == session['author']) \
+        .filter(news_author.c.author_id == author) \
         .join(news_tag, (news_tag.c.news_id == News.news_id)) \
-        .filter(news_tag.c.tag_id.in_(session['tags'])) \
+        .filter(news_tag.c.tag_id.in_(tags)) \
         .order_by(News.creation_date) \
         .paginate(page, NEWS_PER_PAGE, False)

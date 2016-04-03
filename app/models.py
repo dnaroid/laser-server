@@ -56,9 +56,12 @@ class Author(db.Model):
         return self.author_name
 
     @staticmethod
-    def get_all_actual():
-        return Author.query.filter(Author.expired is not None).order_by(
-            'author_name')
+    def get_all_actual_list():
+        return Author.query \
+            .with_entities(Author.author_id, Author.author_name) \
+            .filter(Author.expired is not None) \
+            .order_by('author_name') \
+            .all()
 
 
 class Tag(db.Model):
@@ -66,9 +69,15 @@ class Tag(db.Model):
     tag_id = db.Column(db.Integer, primary_key=True)
     tag_name = db.Column(db.String(30), unique=True)
 
+    def __repr__(self):
+        return '<Tag %r: %r>' % (self.tag_id, self.tag_name)
+
     @staticmethod
-    def get_all():
-        return Tag.query.order_by('tag_name')
+    def get_all_list():
+        return Tag.query \
+            .with_entities(Tag.tag_id, Tag.tag_name) \
+            .order_by('tag_name') \
+            .all()
 
 
 class News(db.Model):
@@ -112,6 +121,13 @@ class News(db.Model):
     @staticmethod
     def get_by_id(id):
         return News.query.filter(News.news_id == id).first()
+
+    @staticmethod
+    def get_news_list(page=0):
+        return News.query \
+            .with_entities(News.news_id, News.title) \
+            .order_by(News.creation_date) \
+            .all()
 
 
 class Comments(db.Model):

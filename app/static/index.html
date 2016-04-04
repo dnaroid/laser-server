@@ -7,35 +7,38 @@
     <link rel="stylesheet" href="/static/css/style.css">
 
     <script type="text/javascript" src="/static/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/static/js/jsrender.min.js"></script>
     <script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="/static/js/bootstrap-multiselect.js"></script>
     <script type="text/javascript" src="/static/js/jquery.cookie.js"></script>
     <script type="text/javascript" src="/static/js/service.js"></script>
+    <!--<script id="NEWS_ROW" type="text/x-jsrender">-->
     <title> News portal</title>
 </head>
 <body>
-{% set admin = g.user.is_authenticated %}
 <wrapper>
 
-    {% include "navigation.html" %}
-
-    <content>
-
-        <table width="100%">
+    <div class="navigation">
+        <table>
             <tr>
-                {% if admin %}
-                    <td width="200">
-                        {% include "menu.html" %}
-                    </td>
-
-                {% endif %}
+                <td width="100%">
+                    <a href="{{ url_for('index') }}"><h2>News portal </h2></a>
+                </td>
                 <td>
-                    <div id="div_content">
-                        {% block content %}{% endblock %}
-                    </div>
+                    <a id="button_login" class="btn btn-xs btn-default"> Login </a>
+                </td>
+                <td>
+                    <a href="#" class="btn btn-xs btn-default"> EN </a>
+                </td>
+                <td>
+                    <a href="#" class="btn btn-xs btn-default"> RU </a>
                 </td>
             </tr>
         </table>
+    </div>
+    <content>
+        <div id="div_content"></div>
+
     </content>
 
     <footer>

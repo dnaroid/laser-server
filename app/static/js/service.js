@@ -1,3 +1,30 @@
+// var myTmpl = $.templates("<label>Name:</label> {{:name}}");
+// var html = myTmpl.render(person);
+var CONTENT = '#div_content';
+var DIV_FORM_FILTER = $.templates('<div id="div_form_filter" align="center">');
+var DIV_NEWS_LIST = $.templates('<div id="div_news_list"><table id="news_table">');
+var DIV_PAGINATION = $.templates('<div id="div_pagination" align="center">');
+
+var PAGE_NEWS_LIST = $.templates('' +
+    '<div id="div_form_filter" align="center">' +
+    '<select id="select_author" name="author" >' +
+    '<option value="0" label="All authors"></option>' +
+    '</select>' +
+    '<select id="select_tags" name="t"  multiple>' +
+    '<option value="0" label="Select tags" disabled></option>' +
+    '</select>' +
+    '<input id="button_filter" type="button" value="Filter">' +
+    '<input id="button_reset" type="button" value="Reset">' +
+    '</div>' +
+    '<div id="div_news_list">' +
+    '<table id="news_table">' +
+    '</table>' +
+    '</div>' +
+    '<div id="div_pagination" align="center">' +
+    '</div>'
+);
+var tags, authors;
+
 $(document).ready(function () {
     init();
 });
@@ -35,46 +62,33 @@ function resetFilter() {
     showNews();
 }
 
-function createTagSelect(data) {
-    $('#div_form_filter').append($('<select id="select_tags" name="t" style="display: none" multiple>'));
-    // $.getJSON(
-    //     '/_get_all_tags',
-    //     function (data) {
-    var opt = $('<option>');
-    opt.attr('value', '0');
-    opt.attr('disabled', 'true');
-    $('#select_tags').append(opt.text('Select tags'));
-    $.each(data, function (key, val) {
-        var opt = $('<option>').text(val);
-        opt.attr('value', key);
-        $('#select_tags').append(opt);
-    });
-    $('#select_tags').multiselect();
-    return false;
-    // }
-    // );
+function loadTagFilter() {
+    $.getJSON(
+        '/_get_all_tags',
+        function (data) {
+            $.each(data, function (key, val) {
+                var opt = $('<option>').text(val);
+                opt.attr('value', key);
+                $('#select_tags').append(opt);
+            });
+            $('#select_tags').multiselect('rebuild');
+        }
+    );
 }
 
-function createAuthorSelect(data) {
-    $('#div_form_filter').append($('<select id="select_author" name="author">'));
-    // $.getJSON(
-    //     '/_get_all_authors',
-    //     function (data) {
-    var opt = $('<option>');
-    opt.attr('label', 'All authors');
-    opt.attr('value', '0');
-    $('#select_author').append(opt);
-
-    $.each(data, function (key, val) {
-        var opt = $('<option>');
-        opt.attr('label', val);
-        opt.attr('value', key);
-        $('#select_author').append(opt);
-    });
-    $('#select_author').multiselect();
-    return false;
-    // }
-    // );
+function loadAuthorFilter() {
+    $.getJSON(
+        '/_get_all_authors',
+        function (data) {
+            $.each(data, function (key, val) {
+                var opt = $('<option>');
+                opt.attr('label', val);
+                opt.attr('value', key);
+                $('#select_author').append(opt);
+            });
+            $('#select_author').multiselect('refresh');
+        }
+    );
 }
 
 function drawFrame() {
@@ -120,37 +134,18 @@ function drawNewsView() {
 
 }
 
+function createFilter() {
+    loadAuthorFilter();
+    loadTagFilter();
+}
+
 function drawNewsList() {
-    var tags, authors;
 
-    $.getJSON(
-        '/_get_all_tags',
-        function (data) {
-            tags = data;
-            console.log('ft:' + data);
-        });
+    $(CONTENT).html(PAGE_NEWS_LIST.render());
 
-    $.getJSON(
-        '/_get_all_authors',
-        function (data) {
-            authors = data;
-            console.log('fa:' + data);
-        });
-
-
-    console.log('a:' + authors);
-    console.log('t:' + tags);
-
-    $('#div_content').append('<div id="div_form_filter" align="center">');
-    $('#div_content').append('<div id="div_news_list"><table id="news_table">');
-    $('#div_content').append('<div id="div_pagination" align="center">');
-
-    createAuthorSelect(authors);
-    createTagSelect(tags);
-
-    $('#div_form_filter').append($('<input id="button_filter" type="button" value="Filter">'));
-    $('#div_form_filter').append($('<input id="button_reset" type="button" value="Reset">'));
-
+    $('#select_tags').multiselect();
+    $('#select_authors').multiselect();
+    createFilter();
     showNews();
 
     $('#button_filter').on('click', function () {

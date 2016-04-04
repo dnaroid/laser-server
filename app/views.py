@@ -153,7 +153,8 @@ def _get_news(page=0):
 @app.route('/index', methods=['GET', 'POST'])
 @app.route('/index/<int:page>', methods=['GET', 'POST'])
 def index(page=1):
-    return render_template('index.html')
+    # return render_template('index.html')
+    return app.send_static_file('index.html')
 
 
 def get_news_page(page=0):

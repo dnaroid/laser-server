@@ -1,9 +1,7 @@
-// var myTmpl = $.templates("<label>Name:</label> {{:name}}");
-// var html = myTmpl.render(person);
 var CONTENT = '#div_content';
 var CNT_FILTER = $.templates('<div id="div_form_filter" align="center">');
 var CNT_NEWS_TABLE = $.templates('<div id="div_news_list"><table id="news_table">');
-var CNT_PAGINATION = $.templates('<div id="div_pagination" align="center">');
+var CNT_PAGINATION = $.templates('<div id="div_pagination" class="on" align="center">');
 var TMP_PAGINATION_BUTTON = $.templates('<input type="button" class="btn btn-default btn-xs {{:current}}" value="{{:idx}}" onclick="showNews({{:idx}})">');
 
 var TMP_PAGE_NEWS_LIST = $.templates('' +
@@ -26,7 +24,25 @@ var TMP_PAGE_NEWS_LIST = $.templates('' +
     '</div>' +
     '</div>'
 );
-var tags, authors;
+
+TMP_NEWS_TABLE = $.templates('{{for list}}' +
+
+    '<tr>' +
+    '<td colspan="2" ><strong>{{>title}}</strong><span>(by {{>author}})</span></td>' +
+    '<td class="right-align">{{>date}}</td>' +
+    '</tr>' +
+
+    '<tr>' +
+    '<td colspan="3">{{>short}}</td>' +
+    '</tr>' +
+
+    '<td colspan="3" class="right-align">' +
+    '<span class="tags-text">{{>tags}}</span>' +
+    '<span class="comments-count">Comments({{>comments}})</span>' +
+    '<span >View</span>' +
+    '</td>' +
+
+    '{{/for}}');
 
 $(document).ready(function () {
     init();
@@ -49,8 +65,8 @@ function init() {
 }
 
 function setFilter(data) {
-    author = $('#select_author').multiselect('getSelected').serialize();
-    tags = $('#select_tags').multiselect('getSelected').serialize();
+    var author = $('#select_author').multiselect('getSelected').serialize();
+    var tags = $('#select_tags').multiselect('getSelected').serialize();
     $.cookie('author', author);
     $.cookie('tags', tags);
     showNews();
@@ -139,7 +155,7 @@ function drawNewsView() {
 
 function createFilter() {
     $('#select_tags').multiselect();
-    $('#select_authors').multiselect();
+    // $('#select_authors').multiselect();
     loadAuthorFilter();
     loadTagFilter();
 }
@@ -168,50 +184,20 @@ function showNews(page) {
         function (data) {
 
             var table = $('#news_table');
-            table.empty();
-            var pages;
-            var page;
-
-            $.each(data, function (id, dic) {
-
-                if (id == 'pagination') {
-                    pages = dic.pages;
-                    page = dic.page;
-                }
-                else {
-
-                    table.append(
-                        row(
-                            col($('<strong>').text(dic.title), ' (by ', dic.author, ')'),
-                            col(dic.date).addClass('right-align').attr('colspan', 2)
-                        )
-                    );
-
-                    table.append(
-                        row(
-                            col(dic.short).attr('colspan', 3)
-                        )
-                    );
-
-                    table.append(
-                        row(
-                            col(
-                                $('<span>').text(dic.tags).addClass('tags-text'),
-                                $('<span>').text('Comments(' + dic.comments + ')').addClass('comments-count'),
-                                $('<span>').text('View').addClass('right-align')).attr('colspan', 3).addClass('right-align')
-                        )
-                    );
-                }
-
-            });
+            var pages = data.num_pages;
+            var page = data.current_page;
+            table.html(TMP_NEWS_TABLE.render({list: data.news_list}));
 
             var pagin = $('#div_pagination');
             pagin.empty();
-            for (var i = 1; i <= pages; i++) {
-                if (i == page) {
-                    pagin.append(TMP_PAGINATION_BUTTON.render({idx: i, current: 'current'}));
-                } else {
-                    pagin.append(TMP_PAGINATION_BUTTON.render({idx: i}));
+            if (pages > 1) {
+                // pagin.css('enabled: true;');
+                for (var i = 1; i <= pages; i++) {
+                    if (i == page) {
+                        pagin.append(TMP_PAGINATION_BUTTON.render({idx: i, current: 'current'}));
+                    } else {
+                        pagin.append(TMP_PAGINATION_BUTTON.render({idx: i}));
+                    }
                 }
             }
         }

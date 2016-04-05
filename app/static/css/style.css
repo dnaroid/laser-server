@@ -42,7 +42,7 @@ footer {
 }
 
 .tags-text {
-    color: #666;
+    color: #888;
 }
 
 .left-align {
@@ -73,9 +73,9 @@ footer {
 }
 
 #div_form_filter {
-    display: table;
-    margin: 0 auto;
-    width: 100%;
+    /*display: table;*/
+    /*margin: 0 auto;*/
+    /*width: 100%;*/
 }
 
 #div_form_filter > * {
@@ -91,9 +91,13 @@ footer {
     padding: .5em;
 }
 
-#div_pagination {
+#div_pagination:enabled {
     padding: 1em;
     background-color: #efefef;
+}
+
+#div_pagination:disabled {
+    background-color: inherit !important;
 }
 
 #div_pagination * {

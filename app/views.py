@@ -129,22 +129,22 @@ def _get_news(page=0):
     items = pagin.items
     pages = pagin.pages
     page = pagin.page
-    res = {
-        'pagination': {
-            'pages': pages,
-            'page': page
-        }}
+    data = []
     for news in items:
-        res[str(news.news_id)] = {
-            'id': news.news_id,
+        data.append({
             'title': news.title,
             'author': news.get_author().author_name,
             'short': news.short_text,
             'tags': news.get_tags(),
             'comments': news.get_comments_count(),
             'date': news.creation_date,
+        })
+        res = {
+            'num_pages': pages,
+            'current_page': page,
+            'news_list': data
         }
-
+    print(res)
     return jsonify(res)
 
 

@@ -1,11 +1,13 @@
 // var myTmpl = $.templates("<label>Name:</label> {{:name}}");
 // var html = myTmpl.render(person);
 var CONTENT = '#div_content';
-var DIV_FORM_FILTER = $.templates('<div id="div_form_filter" align="center">');
-var DIV_NEWS_LIST = $.templates('<div id="div_news_list"><table id="news_table">');
-var DIV_PAGINATION = $.templates('<div id="div_pagination" align="center">');
+var CNT_FILTER = $.templates('<div id="div_form_filter" align="center">');
+var CNT_NEWS_TABLE = $.templates('<div id="div_news_list"><table id="news_table">');
+var CNT_PAGINATION = $.templates('<div id="div_pagination" align="center">');
+var TMP_PAGINATION_BUTTON = $.templates('<input type="button" class="btn btn-default btn-xs {{:current}}" value="{{:idx}}" onclick="showNews({{:idx}})">');
 
-var PAGE_NEWS_LIST = $.templates('' +
+var TMP_PAGE_NEWS_LIST = $.templates('' +
+    '<div id="news_list_cont">' +
     '<div id="div_form_filter" align="center">' +
     '<select id="select_author" name="author" >' +
     '<option value="0" label="All authors"></option>' +
@@ -21,6 +23,7 @@ var PAGE_NEWS_LIST = $.templates('' +
     '</table>' +
     '</div>' +
     '<div id="div_pagination" align="center">' +
+    '</div>' +
     '</div>'
 );
 var tags, authors;
@@ -135,16 +138,15 @@ function drawNewsView() {
 }
 
 function createFilter() {
+    $('#select_tags').multiselect();
+    $('#select_authors').multiselect();
     loadAuthorFilter();
     loadTagFilter();
 }
 
 function drawNewsList() {
 
-    $(CONTENT).html(PAGE_NEWS_LIST.render());
-
-    $('#select_tags').multiselect();
-    $('#select_authors').multiselect();
+    $(CONTENT).html(TMP_PAGE_NEWS_LIST.render());
     createFilter();
     showNews();
 
@@ -206,16 +208,11 @@ function showNews(page) {
             var pagin = $('#div_pagination');
             pagin.empty();
             for (var i = 1; i <= pages; i++) {
-                var a = $('<input>');
-                a.attr('type', 'button');
-                a.addClass('btn btn-default btn-xs');
-                a.attr('value', i);
                 if (i == page) {
-                    a.addClass('btn btn-default btn-xs current');
+                    pagin.append(TMP_PAGINATION_BUTTON.render({idx: i, current: 'current'}));
                 } else {
-                    a.attr('onclick', 'showNews(' + i + ')');
+                    pagin.append(TMP_PAGINATION_BUTTON.render({idx: i}));
                 }
-                pagin.append(a);
             }
         }
     );

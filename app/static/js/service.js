@@ -25,31 +25,28 @@ var TMP_PAGE_NEWS_LIST = $.templates('' +
     '</div>'
 );
 
-TMP_NEWS_TABLE = $.templates('{{for list}}' +
-
+TMP_NEWS_TABLE = $.templates('' +
+    '{{for list}}' +
     '<tr>' +
     '<td colspan="2" ><strong>{{>title}}</strong><span>(by {{>author}})</span></td>' +
     '<td class="right-align">{{>date}}</td>' +
     '</tr>' +
-
     '<tr>' +
     '<td colspan="3">{{>short}}</td>' +
     '</tr>' +
-
     '<td colspan="3" class="right-align">' +
     '<span class="tags-text">{{>tags}}</span>' +
     '<span class="comments-count">Comments({{>comments}})</span>' +
     '<span >View</span>' +
     '</td>' +
-
     '{{/for}}');
 
 $(document).ready(function () {
     init();
 });
 
-var frame = 'news_list';
-// var frame = 'news_edit';
+var page = 'news_list';
+// var page = 'news_edit';
 
 function init() {
     $.cookie('author', 'author=0');
@@ -57,14 +54,14 @@ function init() {
     $.cookie('pages', '0');
 
     $('#button_login').on('click', function () {
-        frame = 'login';
-        drawFrame();
+        page = 'login';
+        drawPage();
     });
 
-    drawFrame();
+    drawPage();
 }
 
-function setFilter(data) {
+function setFilter() {
     var author = $('#select_author').multiselect('getSelected').serialize();
     var tags = $('#select_tags').multiselect('getSelected').serialize();
     $.cookie('author', author);
@@ -107,12 +104,13 @@ function loadAuthorFilter() {
             });
             $('#select_author').multiselect('refresh');
         }
-    );
+    )
+    ;
 }
 
-function drawFrame() {
+function drawPage() {
     $('#div_content').empty();
-    switch (frame) {
+    switch (page) {
         case 'news_list':
             drawNewsList();
             break;
@@ -180,7 +178,7 @@ function showNews(page) {
         page = 1;
     }
     $.getJSON(
-        '/_get_news/' + page,
+        '/_get_news_list/' + page,
         function (data) {
 
             var table = $('#news_table');
@@ -197,6 +195,7 @@ function showNews(page) {
                         pagin.append(TMP_PAGINATION_BUTTON.render({idx: i, current: 'current'}));
                     } else {
                         pagin.append(TMP_PAGINATION_BUTTON.render({idx: i}));
+
                     }
                 }
             }

@@ -99,8 +99,9 @@ def logout():
     return redirect(url_for('index'))
 
 
-@app.route('/news/<string:back>/<int:id>', methods=['GET', 'POST'])
-def show_news(id, back):
+# @app.route('/news/<string:back>/<int:id>', methods=['GET', 'POST'])
+@app.route('/_get_news/<int:id>')
+def _get_news(id):
     form = CommentForm()
     news = News.get_by_id(id)
     if form.is_submitted() and len(form.text.data) > 2:
@@ -109,7 +110,7 @@ def show_news(id, back):
         db.session.add(comment)
         db.session.commit()
         form.text.data = ''
-    return render_template('show_news.html', news=news, back=back, form=form)
+    return render_template('show_news.html', news=news, form=form)
 
 
 @app.route('/_get_all_tags')
@@ -122,8 +123,7 @@ def _get_all_authors():
     return jsonify(Author.get_all_actual_list())
 
 
-@app.route('/_get_news')
-@app.route('/_get_news/<int:page>')
+@app.route('/_get_news_list/<int:page>')
 def _get_news(page=0):
     pagin = get_news_page(page)
     items = pagin.items
@@ -137,13 +137,11 @@ def _get_news(page=0):
             'short': news.short_text,
             'tags': news.get_tags(),
             'comments': news.get_comments_count(),
-            'date': news.creation_date,
-        })
-        res = {
-            'num_pages': pages,
-            'current_page': page,
-            'news_list': data
-        }
+            'date': news.creation_date})
+    res = {
+        'num_pages': pages,
+        'current_page': page,
+        'news_list': data}
     print(res)
     return jsonify(res)
 
@@ -151,9 +149,8 @@ def _get_news(page=0):
 # news list
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
-@app.route('/index/<int:page>', methods=['GET', 'POST'])
-def index(page=1):
-    # return render_template('index.html')
+# @app.route('/index/<int:page>', methods=['GET', 'POST'])
+def index():
     return app.send_static_file('index.html')
 
 
@@ -179,21 +176,21 @@ def get_news_page(page=0):
         return News.query \
             .order_by(News.creation_date) \
             .paginate(page, NEWS_PER_PAGE, False)
-    # author filter only
+        # author filter only
     if no_tags:
         return News.query \
             .join(news_author, (news_author.c.news_id == News.news_id)) \
             .filter(news_author.c.author_id == author) \
             .order_by(News.creation_date) \
             .paginate(page, NEWS_PER_PAGE, False)
-    # tag filter only
+        # tag filter only
     if no_author:
         return News.query \
             .join(news_tag, (news_tag.c.news_id == News.news_id)) \
             .filter(news_tag.c.tag_id.in_(tags)) \
             .order_by(News.creation_date) \
             .paginate(page, NEWS_PER_PAGE, False)
-    # author & tag filters
+        # author & tag filters
     return News.query \
         .join(news_author, (news_author.c.news_id == News.news_id)) \
         .filter(news_author.c.author_id == author) \

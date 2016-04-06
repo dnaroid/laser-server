@@ -10,7 +10,7 @@ var TMP_PAGE_NEWS_LIST = $.templates('' +
     '<select id="select_author" name="author" >' +
     '<option value="0" label="All authors"></option>' +
     '</select>' +
-    '<select id="select_tags" name="t"  multiple>' +
+    '<select id="select_tags" name="t" multiple>' +
     '<option value="0" label="Select tags" disabled></option>' +
     '</select>' +
     '<input id="button_filter" type="button" value="Filter">' +
@@ -57,13 +57,34 @@ function init() {
         page = 'login';
         drawPage();
     });
-
     drawPage();
 }
 
+
+var expanded = false;
+
+function hideCheckboxes() {
+    var checkboxes = document.getElementById("checkboxes");
+    checkboxes.style.display = "none";
+    expanded = false;
+}
+
+function showCheckboxes() {
+    var checkboxes = document.getElementById("checkboxes");
+    if (!expanded) {
+        checkboxes.style.display = "block";
+        expanded = true;
+    } else {
+        checkboxes.style.display = "none";
+        expanded = false;
+    }
+}
+
 function setFilter() {
-    var author = $('#select_author').multiselect('getSelected').serialize();
-    var tags = $('#select_tags').multiselect('getSelected').serialize();
+//    var author = $('#select_author').multiselect('getSelected').serialize();
+    var author = $('#select_author').serialize();
+//    var tags = $('#select_tags').multiselect('getSelected').serialize();
+    var tags = $('#select_tags').serialize();
     $.cookie('author', author);
     $.cookie('tags', tags);
     showNews();
@@ -72,9 +93,9 @@ function setFilter() {
 function resetFilter() {
     $.cookie('author', 'author=0');
     $.cookie('tags', '');
-    $('#select_author').multiselect('select', [0]);
-    $('#select_author').multiselect('refresh');
-    $('#select_tags').multiselect('clearSelection');
+//    $('#select_author').multiselect('select', [0]);
+//    $('#select_author').multiselect('refresh');
+//    $('#select_tags').multiselect('clearSelection');
     showNews();
 }
 
@@ -87,7 +108,7 @@ function loadTagFilter() {
                 opt.attr('value', key);
                 $('#select_tags').append(opt);
             });
-            $('#select_tags').multiselect('rebuild');
+//            $('#select_tags').multiselect('rebuild');
         }
     );
 }
@@ -102,7 +123,7 @@ function loadAuthorFilter() {
                 opt.attr('value', key);
                 $('#select_author').append(opt);
             });
-            $('#select_author').multiselect('refresh');
+//            $('#select_author').select2('refresh');
         }
     )
     ;
@@ -152,8 +173,8 @@ function drawNewsView() {
 }
 
 function createFilter() {
-    $('#select_tags').multiselect();
-    // $('#select_authors').multiselect();
+    $('#select_tags').select2();
+    $('#select_authors').select2();
     loadAuthorFilter();
     loadTagFilter();
 }

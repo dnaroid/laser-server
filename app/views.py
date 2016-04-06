@@ -6,7 +6,7 @@ from sqlalchemy import func
 
 from app import app, db, babel, lm
 from app.forms import AddNewsForm, CommentForm, LoginForm
-from app.models import News, news_author, Author, Tag, news_tag, Comments, User
+from app.models import News, news_author, Author, Tag, news_tag, User
 from config import LANGUAGES, NEWS_PER_PAGE
 
 
@@ -104,13 +104,13 @@ def logout():
 def _get_news(id):
     form = CommentForm()
     news = News.get_by_id(id)
-    if form.is_submitted() and len(form.text.data) > 2:
-        comment = Comments(news_id=id, comment_text=form.text.data,
-                           creation_date=func.current_timestamp())
-        db.session.add(comment)
-        db.session.commit()
-        form.text.data = ''
-    return render_template('show_news.html', news=news, form=form)
+    # if form.is_submitted() and len(form.text.data) > 2:
+    #     comment = Comments(news_id=id, comment_text=form.text.data,
+    #                        creation_date=func.current_timestamp())
+    #     db.session.add(comment)
+    #     db.session.commit()
+    #     form.text.data = ''
+    return jsonify(news)
 
 
 @app.route('/_get_all_tags')
@@ -124,7 +124,7 @@ def _get_all_authors():
 
 
 @app.route('/_get_news_list/<int:page>')
-def _get_news(page=0):
+def _get_news_list(page=0):
     pagin = get_news_page(page)
     items = pagin.items
     pages = pagin.pages

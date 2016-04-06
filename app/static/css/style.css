@@ -112,3 +112,41 @@ footer {
 span {
     padding: .5em;
 }
+
+/*----------------------------------*/
+.multiselect {
+    width: 200px;
+}
+
+.selectBox {
+    position: relative;
+}
+
+.selectBox select {
+    width: 100%;
+    /*font-weight: bold;*/
+}
+
+.overSelect {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+}
+
+#checkboxes {
+    display: none;
+    border: 1px #333 solid;
+    background: #fff;
+    position: absolute;
+    z-index: 1000;
+}
+
+#checkboxes label {
+    display: block;
+}
+
+#checkboxes label:hover {
+    background-color: #ddd;
+}

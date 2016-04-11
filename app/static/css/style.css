@@ -26,22 +26,31 @@ footer {
 
 .navigation {
     width: 100%;
+    /*position: fixed;*/
+    /*background: white;*/
+    /*margin: 0 auto;*/
+    /*padding-bottom: 1em;*/
 }
 
-.nondeco {
+.navigation span {
+    padding: .2em;
+}
+
+a {
     text-decoration: none;
-    color: #55f;
+    color: #00f;
 }
 
 .right-align {
     text-align: right;
 }
 
-.comments-count {
-    color: #f66;
+.commentsCounter {
+    color: #f00;
+    padding: .5em;
 }
 
-.tags-text {
+.tagsCol {
     color: #888;
 }
 
@@ -53,100 +62,134 @@ footer {
     text-align: center;
 }
 
-.comment-text {
+.commentsText {
     background-color: #eee;
 }
 
-.login-form {
-    padding-top: 5em;
+#loginForm table {
+    width: auto !important;
+    text-align: left;
+    margin: 2em auto;
+    border: 1px solid black;
 }
 
-.login-form td {
-    padding: .2em;
-}
-
-.menu {
+#menu {
     position: fixed;
-    top: 8em;
-    border: solid black 1px;
-    padding: .5em;
+    top: 5em;
+    left: 0;
+    /*border: solid black 1px;*/
+    /*width: 12em;*/
+    /*width: auto;*/
 }
 
-#div_form_filter {
-    /*display: table;*/
-    /*margin: 0 auto;*/
-    /*width: 100%;*/
-}
-
-#div_form_filter > * {
-    margin: .5em;
-}
-
-#news_table {
+#filterCont {
+    text-align: center;
+    /*display: inline-block;*/
+    margin: 0 auto;
     width: 100%;
 }
 
-#news_table td {
-    /*border: black 1px solid;*/
+td.names {
+    width: 60%;
+}
+
+td.menu {
+    width: 20%;
+}
+
+#filterCont input {
+    margin: .2em;
+}
+
+table textarea {
+    width: 100%;
+}
+
+textarea[rows="1"] {
+    overflow: hidden;
+    resize: none;
+}
+
+.stop-scrolling {
+    height: 100%;
+    overflow: hidden;
+}
+
+table {
+    width: 100%;
+}
+
+td {
     padding: .5em;
+    /*border: black 1px solid;*/
 }
 
-#div_pagination:enabled {
-    padding: 1em;
-    background-color: #efefef;
+#paginateCont {
+    text-align: center;
+    width: 100%;
 }
 
-#div_pagination:disabled {
-    background-color: inherit !important;
+.pgBtn {
+    border: black 1px solid;
+    border-radius: 2px;
+    padding: 0 .25em;
+    color: black;
 }
 
-#div_pagination * {
+.pgBtn {
+    border: black 1px solid;
+    border-radius: 2px;
+    padding: 0 .25em;
+    color: black;
+    background: white;
     margin: 2px;
 }
 
-#div_pagination .current {
-    background-color: #333;
+.pgBtn:hover {
+    background: lightgray;
+}
+
+.current {
+    background-color: #333 !important;
     color: #fff;
 }
 
-span {
-    padding: .5em;
+.welcome {
+    font-weight: bolder;
 }
 
-/*----------------------------------*/
-.multiselect {
-    width: 200px;
+#bannerBtn {
+    font-weight: bolder;
+    font-size: x-large;
 }
 
-.selectBox {
-    position: relative;
+.boldText {
+    font-weight: bolder;
 }
 
-.selectBox select {
+/*#navigationCont table {*/
+/*width: 100%;*/
+/*padding: 1em;*/
+/*}*/
+
+.grey {
+    background-color: #aaa !important;
+}
+
+.commentInput {
     width: 100%;
-    /*font-weight: bold;*/
 }
 
-.overSelect {
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
+.commentsDate {
+    position: relative;
+    bottom: -.5em;
+    text-decoration: underline;
+    padding-top: .5em;
 }
 
-#checkboxes {
-    display: none;
-    border: 1px #333 solid;
-    background: #fff;
-    position: absolute;
-    z-index: 1000;
-}
-
-#checkboxes label {
-    display: block;
-}
-
-#checkboxes label:hover {
-    background-color: #ddd;
+.delCommentBtn {
+    position: relative;
+    float: right;
+    /*top: -.2em;*/
+    /*right: -.2em;*/
 }

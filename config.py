@@ -25,7 +25,7 @@ LANGUAGES = {
 }
 
 # slow database query threshold (in seconds)
-DATABASE_QUERY_TIMEOUT = 0.5
+# DATABASE_QUERY_TIMEOUT = 0.5
 
 # os.environ.get('HEROKU')
 

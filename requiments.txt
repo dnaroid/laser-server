@@ -1,13 +1,9 @@
 migrate
-Babel
 Flask
-Flask-Babel
 Flask-Login
 Flask-SQLAlchemy
-Flask-WTF
 SQLAlchemy
 Tempita
-WTForms
 Werkzeug
 blinker
 coverage

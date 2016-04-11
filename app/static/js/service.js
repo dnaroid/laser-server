@@ -1,242 +1,542 @@
-var CONTENT = '#div_content';
-var CNT_FILTER = $.templates('<div id="div_form_filter" align="center">');
-var CNT_NEWS_TABLE = $.templates('<div id="div_news_list"><table id="news_table">');
-var CNT_PAGINATION = $.templates('<div id="div_pagination" class="on" align="center">');
-var TMP_PAGINATION_BUTTON = $.templates('<input type="button" class="btn btn-default btn-xs {{:current}}" value="{{:idx}}" onclick="showNews({{:idx}})">');
-
-var TMP_PAGE_NEWS_LIST = $.templates('' +
-    '<div id="news_list_cont">' +
-    '<div id="div_form_filter" align="center">' +
-    '<select id="select_author" name="author" >' +
-    '<option value="0" label="All authors"></option>' +
-    '</select>' +
-    '<select id="select_tags" name="t" multiple>' +
-    '<option value="0" label="Select tags" disabled></option>' +
-    '</select>' +
-    '<input id="button_filter" type="button" value="Filter">' +
-    '<input id="button_reset" type="button" value="Reset">' +
-    '</div>' +
-    '<div id="div_news_list">' +
-    '<table id="news_table">' +
-    '</table>' +
-    '</div>' +
-    '<div id="div_pagination" align="center">' +
-    '</div>' +
-    '</div>'
-);
-
-TMP_NEWS_TABLE = $.templates('' +
-    '{{for list}}' +
-    '<tr>' +
-    '<td colspan="2" ><strong>{{>title}}</strong><span>(by {{>author}})</span></td>' +
-    '<td class="right-align">{{>date}}</td>' +
-    '</tr>' +
-    '<tr>' +
-    '<td colspan="3">{{>short}}</td>' +
-    '</tr>' +
-    '<td colspan="3" class="right-align">' +
-    '<span class="tags-text">{{>tags}}</span>' +
-    '<span class="comments-count">Comments({{>comments}})</span>' +
-    '<span >View</span>' +
-    '</td>' +
-    '{{/for}}');
-
 $(document).ready(function () {
     init();
 });
 
-var page = 'news_list';
-// var page = 'news_edit';
 
 function init() {
-    $.cookie('author', 'author=0');
-    $.cookie('tags', '');
-    $.cookie('pages', '0');
+    logged = false;
+    user = undefined;
+    // logged = true;
+    // user = 'admin';
+    authorFilter = '0'
+    tagsFilter = ''
+    allAuthors = []
+    activeAuthors = []
+    allTags = []
+    comments = []
+    loginCont = '#loginCont';
+    menuCont = '#menuCont';
+    navigationCont = '#navigationCont';
+    paginateCont = '#paginateCont';
+    filterCont = '#filterCont';
+    newsListCont = '#newsListCont';
+    newsListBlock = '#newsListBlock';
+    filterCont = '#filterCont';
+    selectorCont = '#selectorCont';
+    newsViewCont = '#newsViewCont';
+    tmpMultiSelect = $.templates('#tmpMultiSelect');
+    tmpNewsListPage = $.templates('#tmpNewsListPage');
+    tmpNavigation = $.templates('#tmpNavigation');
+    tmpNewsList = $.templates('#tmpNewsList');
+    tmpFilter = $.templates('#tmpFilter');
+    tmpPaginBtn = $.templates('#tmpPaginBtn');
+    tmpLoginPage = $.templates('#tmpLoginPage');
+    tmpSideMenu = $.templates('#tmpSideMenu');
+    tmpAddNews = $.templates('#tmpAddNews');
+    tmpShowNews = $.templates('#tmpShowNews');
+    tmpSelector = $.templates('#tmpSelector');
+    tmpAddComment = $.templates('#tmpAddComment');
+    tmpEditAuthors = $.templates('#tmpEditAuthors');
+    tmpEditTags = $.templates('#tmpEditTags');
 
-    $('#button_login').on('click', function () {
-        page = 'login';
-        drawPage();
-    });
-    drawPage();
+    loadFilterData();
+    drawNavigation();
+    drawNewsList();
 }
 
-
-var expanded = false;
-
-function hideCheckboxes() {
-    var checkboxes = document.getElementById("checkboxes");
-    checkboxes.style.display = "none";
-    expanded = false;
+function scrollOff() {
+    var x = window.scrollX;
+    var y = window.scrollY;
+    window.onscroll = function () {
+        window.scrollTo(x, y);
+    };
 }
 
-function showCheckboxes() {
-    var checkboxes = document.getElementById("checkboxes");
-    if (!expanded) {
-        checkboxes.style.display = "block";
-        expanded = true;
-    } else {
-        checkboxes.style.display = "none";
-        expanded = false;
+function scrollOn() {
+    setTimeout(function () {
+        window.onscroll = function () {
+        };
+    }, 200);
+}
+
+function switchPage(page) {
+    switch (page) {
+        case 'newsList':
+            $(newsViewCont).css('display', 'none');
+            $(newsListBlock).css('display', 'block');
+            $(loginCont).css('display', 'none');
+            break;
+        case 'newsEdit':
+        case 'newsAdd':
+        case 'newsView':
+            $(newsViewCont).css('display', 'block');
+            $(newsListBlock).css('display', 'none');
+            $(loginCont).css('display', 'none');
+            break;
+        case 'loginPage':
+            $(newsViewCont).css('display', 'none');
+            $(newsListBlock).css('display', 'none');
+            $(loginCont).css('display', 'block');
+            break;
+        case 'newsList':
+            break;
+
     }
+
 }
 
 function setFilter() {
-//    var author = $('#select_author').multiselect('getSelected').serialize();
-    var author = $('#select_author').serialize();
-//    var tags = $('#select_tags').multiselect('getSelected').serialize();
-    var tags = $('#select_tags').serialize();
-    $.cookie('author', author);
-    $.cookie('tags', tags);
-    showNews();
+    if ($('#authorFilter option:selected').val() > 0
+        || $('#tagsSelect input:checked').length) {
+        authorFilter = $('#authorFilter option:selected').val();
+        var tags = []
+        $('#tagsSelect input:checked').each(
+            function () {
+                tags.push($(this).val());
+            }
+        );
+        tagsFilter = tags;
+        drawNewsList();
+    }
 }
 
 function resetFilter() {
-    $.cookie('author', 'author=0');
-    $.cookie('tags', '');
-//    $('#select_author').multiselect('select', [0]);
-//    $('#select_author').multiselect('refresh');
-//    $('#select_tags').multiselect('clearSelection');
-    showNews();
+    if ($('#authorFilter option:selected').val() > 0
+        || $('#tagsSelect input:checked').length) {
+        authorFilter = '0'
+        tagsFilter = ''
+        $('#authorFilter').val(0);
+        $("#ms1 input:checked").prop({'checked': false});
+        $('#ms1 .dropDown').trigger('change');
+        drawNewsList();
+    }
 }
 
-function loadTagFilter() {
+function loadFilterData() {
     $.getJSON(
         '/_get_all_tags',
         function (data) {
-            $.each(data, function (key, val) {
-                var opt = $('<option>').text(val);
-                opt.attr('value', key);
-                $('#select_tags').append(opt);
-            });
-//            $('#select_tags').multiselect('rebuild');
+            allTags = data;
+            if (allAuthors != []) {
+                drawFilter();
+            }
         }
     );
-}
-
-function loadAuthorFilter() {
     $.getJSON(
         '/_get_all_authors',
         function (data) {
-            $.each(data, function (key, val) {
-                var opt = $('<option>');
-                opt.attr('label', val);
-                opt.attr('value', key);
-                $('#select_author').append(opt);
-            });
-//            $('#select_author').select2('refresh');
+            allAuthors = data;
+            // if (allTags != []) {
+            //     drawFilter();
+            // }
         }
-    )
-    ;
-}
-
-function drawPage() {
-    $('#div_content').empty();
-    switch (page) {
-        case 'news_list':
-            drawNewsList();
-            break;
-        case 'news_view':
-            drawNewsView();
-            break;
-        case 'login':
-            drawLogin();
-            break;
-    }
-}
-
-function drawLogin() {
-    $('#div_content').append('<div align="center"><form class="login-form">');
-    $('#div_content').append($('<table>')
-        .append(
-            row(
-                col('Login:'),
-                col($('<input type="text">'))
-            ))
-        .append(
-            row(
-                col('Password:'),
-                col($('<input type="password">'))
-            ))
-        .append(
-            row(
-                col(),
-                col($('<input type="button" onclick="login()">'))
-            ))
     );
-}
-
-function login() {
-}
-
-function drawNewsView() {
-
-}
-
-function createFilter() {
-    $('#select_tags').select2();
-    $('#select_authors').select2();
-    loadAuthorFilter();
-    loadTagFilter();
-}
-
-function drawNewsList() {
-
-    $(CONTENT).html(TMP_PAGE_NEWS_LIST.render());
-    createFilter();
-    showNews();
-
-    $('#button_filter').on('click', function () {
-        setFilter();
-    });
-
-    $('#button_reset').on('click', function () {
-        resetFilter();
-    });
-}
-
-function showNews(page) {
-    if (page == undefined) {
-        page = 1;
-    }
     $.getJSON(
-        '/_get_news_list/' + page,
+        '/_get_active_authors',
         function (data) {
-
-            var table = $('#news_table');
-            var pages = data.num_pages;
-            var page = data.current_page;
-            table.html(TMP_NEWS_TABLE.render({list: data.news_list}));
-
-            var pagin = $('#div_pagination');
-            pagin.empty();
-            if (pages > 1) {
-                // pagin.css('enabled: true;');
-                for (var i = 1; i <= pages; i++) {
-                    if (i == page) {
-                        pagin.append(TMP_PAGINATION_BUTTON.render({idx: i, current: 'current'}));
-                    } else {
-                        pagin.append(TMP_PAGINATION_BUTTON.render({idx: i}));
-
-                    }
-                }
+            activeAuthors = data;
+            if (allTags != []) {
+                drawFilter();
             }
         }
     );
 }
 
-function row() {
-    var res = $('<tr>');
-    for (var i = 0; i < arguments.length; i++) {
-        res.append(arguments[i]);
-    }
-    return res;
+function drawFilter() {
+    $(filterCont).css('display', 'none');
+    $(filterCont).html(tmpFilter.render({authors: activeAuthors, tags: allTags}));
+    $(filterCont).css('display', 'block');
 }
 
-function col() {
-    var res = $('<td>');
-    for (var i = 0; i < arguments.length; i++) {
-        res.append(arguments[i]);
+function drawNavigation() {
+    $(navigationCont).html(tmpNavigation.render({user: user}));
+    if (logged) {
+        drawSideMenu();
+    } else {
+        $('#menuCol').width(0);
+        $(menuCont).empty();
     }
-    return res;
+
+    $('#loginBtn').on('click', function () {
+        drawLoginPage();
+    });
+
+    $('#logoutBtn').on('click', function () {
+        doLogout();
+    });
+
+    $('#bannerBtn').on('click', function () {
+        drawNewsList();
+    });
 }
 
+function drawSideMenu() {
+    $('#menuCol').width('10em');
+    $(menuCont).html(tmpSideMenu.render());
+}
+
+function drawEditAuthors() {
+    scrollOff();
+    $(newsViewCont).html(tmpEditAuthors.render({authors: allAuthors}));
+    switchPage('newsView');
+    scrollOn();
+}
+
+function drawEditTags() {
+    scrollOff();
+    $(newsViewCont).html(tmpEditTags.render({tags: allTags}));
+    switchPage('newsView');
+    scrollOn();
+}
+
+function drawAddNews() {
+    $(newsViewCont).html(tmpAddNews.render({authors: allAuthors, tags: allTags}));
+    $('#addNewsDate').val(getToday());
+    switchPage('newsView');
+
+    $('#addNewsSaveBtn').on('click', function () {
+        var title = $('#addNewsTitle').val();
+        var short = $('#addNewsBrief').val();
+        var full = $('#addNewsContent').val();
+        var date = $('#addNewsDate').val();
+        var author = $('#addNewsAuthorSelect option:selected').val();
+        var tags = []
+        $('#addNewsTagsSelect input:checked').each(
+            function () {
+                tags.push($(this).val());
+            }
+        );
+        var data = JSON.stringify({
+            title: title,
+            creation_date: date,
+            short_text: short,
+            full_text: full,
+            author_id: author,
+            tags: tags
+        });
+        if (author > 0) {
+            $.post('/_add_news', data, function (resp) {
+                console.log(resp);
+                drawNewsList()
+            })
+        }
+    })
+}
+
+function updateAuthor(id) {
+    var newName = $('#editAuthorsTable textarea[idx=' + id + ']').val();
+    var data = JSON.stringify({
+        id: id,
+        new_name: newName
+    });
+    $.post('/_update_author', data);
+    allAuthors[id] = newName;
+    drawFilter();
+    drawEditAuthors();
+}
+
+function updateTag(id) {
+    var newName = $('#editTagsTable textarea[idx=' + id + ']').val();
+    var data = JSON.stringify({
+        id: id,
+        new_name: newName
+    });
+    $.post('/_update_tag', data);
+    allTags[id] = newName;
+    drawFilter();
+    drawEditTags();
+}
+
+function deleteTag(id) {
+    var data = JSON.stringify({
+        id: id
+    });
+    $.post('/_del_tag', data);
+    delete allTags[id];
+    drawFilter();
+    drawEditTags();
+}
+
+function expireAuthor(id) {
+    var data = JSON.stringify({
+        id: id
+    });
+    var name = allAuthors[id];
+    $.post('/_expire_author', data);
+    delete allAuthors[id];
+    drawFilter();
+    drawEditAuthors();
+}
+
+function addTag() {
+    var name = $('.newTagName').val();
+    var data = JSON.stringify({
+        name: name
+    });
+
+    $.post('/_add_tag', data, function (resp) {
+            var json = $.parseJSON(resp);
+            var new_id = json.new_id;
+            allTags[new_id] = name;
+            drawFilter();
+            drawEditTags();
+        }
+    );
+}
+
+function addAuthor() {
+    var name = $('.newAuthorName').val();
+    var data = JSON.stringify({
+        name: name
+    });
+
+    $.post('/_add_author', data, function (resp) {
+            var json = $.parseJSON(resp);
+            if (resp == 'ok') {
+                var new_id = json.new_id;
+                allAuthors[new_id] = name;
+                drawFilter();
+                drawEditAuthors();
+            }
+        }
+    );
+}
+
+
+function drawNewsView(id) {
+    $.getJSON('/_get_news?id=' + id, function (data) {
+        var comments = [];
+        var len = data.comments.length;
+
+        for (var i = 0; i < len; i++) {
+            var arr = data.comments[i];
+            comments.push({
+                id: arr[0],
+                date: arr[1],
+                text: arr[2],
+                news_id: arr[3]
+            });
+        }
+        $(newsViewCont).html(tmpShowNews.render({user: user, data: data, comments: comments}));
+        switchPage('newsView');
+        $('#sendCommentButton').on('click', function () {
+            addComment(data.id, $('#commentText').val());
+        });
+        $('#backBtn').on('click', function () {
+            switchPage('newsList');
+        });
+        $('#prevBtn').on('click', function () {
+            drawNewsView(data.id - 1);//todo
+        });
+        $('#nextBtn').on('click', function () {
+            drawNewsView(data.id + 1);//todo
+        });
+    });
+}
+
+function deleteComment(id, newsId) {
+    $.get('/_del_comment', 'id=' + id);
+
+    $('#newsTable .comments').each(function () {
+        if ($(this).attr('idx') == id) {
+            $(this).remove();
+        }
+    });
+
+    // decrement comments counter in news list
+    $('.commentsCounter span').each(function () {
+        if ($(this).attr('idx') == newsId) {
+            $(this).text($(this).text() - 1);
+        }
+    });
+}
+
+function drawNewsList(page) {
+    $(paginateCont).css('display', 'none');
+    switchPage('newsList');
+    var page2 = page;
+    if (page2 == undefined) {
+        page2 = '1';
+    }
+    var filter = JSON.stringify({
+        author: authorFilter,
+        tags: tagsFilter
+    });
+    var request = '';
+    if (authorFilter != '0' && tagsFilter != '') {
+        request = '/_get_news_list_by_author_and_tags/';
+    }
+    else if (authorFilter != '0') {
+        request = '/_get_news_list_by_author/';
+    }
+    else if (tagsFilter != '') {
+        request = '/_get_news_list_by_tags/';
+    } else {
+        request = '/_get_news_list/';
+    }
+    $.post(request + page2, filter,
+        function (data) {
+            $(newsListCont).html(tmpNewsList.render({user: user, list: data.news_list}));
+            var current_page = data.current_page;
+            $('#newsListTable a').each(function (i) {
+                $(this).on('click', function () {
+                    drawNewsView($(this).prop('id'), current_page);
+                });
+            });
+            paginate(data.num_pages, current_page);
+            $(paginateCont).css('display', 'block');
+        }
+    );
+}
+
+function deleteNews() {
+    var ids = [];
+    $('#newsListTable input:checked').each(
+        function () {
+            ids.push($(this).val());
+        }
+    );
+    var data = JSON.stringify({
+        id: ids
+    });
+    console.log(data);
+    $.post('/_del_news', data, function () {
+        drawNewsList();
+    })
+}
+
+function paginate(numPages, curPage) {
+    var pagin = $('#paginateCont');
+    pagin.empty();
+    if (numPages > 1) {
+        for (var i = 1; i <= numPages; i++) {
+            if (i == curPage) {
+                pagin.append(tmpPaginBtn.render({id: i, cls: ' current'}));
+            } else {
+                pagin.append(tmpPaginBtn.render({id: i}));
+                $('#paginateCont a').on('click', function () {
+                    var page = $(this).text();
+                    if (page == undefined) {
+                        page = '1';
+                    }
+                    var filter = JSON.stringify({
+                        author: authorFilter,
+                        tags: tagsFilter
+                    });
+                    var request = '';
+                    if (authorFilter != '0' && tagsFilter != '') {
+                        request = '/_get_news_list_by_author_and_tags/';
+                    }
+                    else if (authorFilter != '0') {
+                        request = '/_get_news_list_by_author/';
+                    }
+                    else if (tagsFilter != '') {
+                        request = '/_get_news_list_by_tags/';
+                    } else {
+                        request = '/_get_news_list/';
+                    }
+                    $.post(request + page, filter,
+                        function (data) {
+                            $(newsListCont).html(tmpNewsList.render({user: user, list: data.news_list}));
+                            var curPg = data.current_page;
+                            $('#newsListTable a').each(function (i) {
+                                $(this).on('click', function () {
+                                    drawNewsView($(this).prop('id'), curPg);
+                                });
+                            });
+                            paginate(data.num_pages, curPg);
+                        }
+                    );
+                });
+            }
+        }
+    }
+}
+
+function drawLoginPage() {
+    switchPage('loginPage');
+    $(loginCont).html(tmpLoginPage.render());
+    $('#loginSubmit').on('click', function () {
+        var form = $('#loginForm').serialize();
+        $.post('/_login', form, function (data) {
+            if (data.login == 'ok') {
+                logged = true;
+                user = data.user;
+                $(loginCont).css('display', 'none');
+                $(newsListBlock).css('display', 'block');
+                drawNavigation();
+                drawNewsList();
+            }
+        });
+    });
+}
+
+function doLogout() {
+    $.get('/_logout', function () {
+        logged = false;
+        user = undefined;
+        drawNavigation();
+        drawNewsList();
+    });
+}
+
+function addComment(newsId, text) {
+    if (text.length > 1) {
+        var data = JSON.stringify({
+            news_id: newsId,
+            text: text
+        });
+
+        var new_id = '$$new$$';
+
+        $('#commentText').val('');
+
+        $.post('/_add_comment', data, function (resp) {
+                var json = $.parseJSON(resp);
+                new_id = json.new_id;
+                // update new comment id
+                $("#newsTable").html($("#newsTable").html().replace(/\$\$new\$\$/g, new_id));
+
+            }
+        );
+
+        var $newComm = tmpAddComment.render({
+            date: getToday(1),
+            text: text,
+            user: user,
+            id: new_id,
+            newsId: newsId
+        });
+
+        $('#newsTable tr.comments').last().after($($newComm));
+
+        // increment comments counter in news list
+        $('.commentsCounter span').each(function () {
+            if ($(this).attr('idx') == newsId) {
+                $(this).text(parseInt($(this).text()) + 1);
+            }
+        });
+
+    }
+}
+
+function getToday(time) {
+
+    var CurrentDate = new Date();
+    var day = CurrentDate.getDate();
+    var month = CurrentDate.getMonth() + 1;
+    var year = CurrentDate.getFullYear();
+    var hrs = CurrentDate.getHours();
+    var min = CurrentDate.getMinutes();
+    var sec = CurrentDate.getSeconds();
+    if (month < 10)
+        month = "0" + month;
+    if (day < 10)
+        day = "0" + day;
+    if (time == undefined) {
+        var today = day + "/" + month + "/" + year;
+    } else {
+        var today = day + "/" + month + "/" + year + ' ' + hrs + ':' + min;
+    }
+    return today;
+}

@@ -59,7 +59,16 @@ class Author(db.Model):
     def get_all_actual_list():
         return Author.query \
             .with_entities(Author.author_id, Author.author_name) \
-            .filter(Author.expired is not None) \
+            .filter(Author.expired.is_(None)) \
+            .order_by('author_name') \
+            .all()
+
+    @staticmethod
+    def get_all_active():
+        return Author.query \
+            .with_entities(Author.author_id, Author.author_name) \
+            .join(news_author) \
+            .filter(news_author.c.author_id == Author.author_id) \
             .order_by('author_name') \
             .all()
 
@@ -89,19 +98,30 @@ class News(db.Model):
     creation_date = db.Column(db.TIMESTAMP)
     modification_date = db.Column(db.Date)
     comments = db.relationship('Comments', backref="author", lazy='dynamic')
+
     author = db.relationship('Author', secondary=news_author,
                              primaryjoin=(news_author.c.news_id == news_id),
-                             # secondaryjoin=(news_author.c.author_id),
+                             secondaryjoin=(
+                                 news_author.c.author_id == Author.author_id),
                              backref=db.backref('author', lazy='dynamic'),
                              lazy='dynamic')
     tags = db.relationship('Tag', secondary=news_tag,
                            primaryjoin=(news_tag.c.news_id == news_id),
-                           # secondaryjoin=(news_tag.c.tag_id),
+                           secondaryjoin=(news_tag.c.tag_id == Tag.tag_id),
                            backref=db.backref('tags', lazy='dynamic'),
                            lazy='dynamic')
 
+    def set_author(self):
+        ...
+
     def get_comments(self):
         return Comments.query.filter(Comments.news_id == self.news_id).all()
+
+    def get_comments_list(self):
+        return Comments.query \
+            .with_entities(Comments.comment_id, Comments.creation_date,
+                           Comments.comment_text, Comments.news_id) \
+            .filter(Comments.news_id == self.news_id).all()
 
     def get_comments_count(self):
         return Comments.query.filter(Comments.news_id == self.news_id).count()
@@ -128,6 +148,9 @@ class News(db.Model):
             .with_entities(News.news_id, News.title) \
             .order_by(News.creation_date) \
             .all()
+
+    def __repr__(self):
+        return '<News %r: %r>' % (self.news_id, self.title)
 
 
 class Comments(db.Model):

@@ -1,0 +1,43 @@
+
+.ms {
+    width: 150px;
+    display: inline-block;
+}
+
+.ms .selectBox {
+    position: relative;
+}
+
+.ms .selectBox select {
+    width: 100%;
+}
+
+.ms .overSelect {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 5px;
+    bottom: 0;
+}
+
+.ms .dropDown {
+    font-size: 80%;
+    text-align: left;
+    display: none;
+    border: 1px #666 solid;
+    background: #fff;
+    position: absolute;
+    z-index: 1000;
+    padding-bottom: .5em;
+}
+
+.ms .dropDown label {
+    width: auto;
+    display: inline;
+    padding-right: 10px;
+}
+
+.ms .dropDown label:hover {
+    display: inline;
+    background-color: #ddd;
+}

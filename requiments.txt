@@ -2,6 +2,7 @@ migrate
 Flask
 Flask-Login
 Flask-SQLAlchemy
+jinja2
 SQLAlchemy
 Tempita
 Werkzeug

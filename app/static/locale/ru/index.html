@@ -15,14 +15,16 @@
 <script id="tmpShowNews" type="text/html">
     <table id="newsTable">
         <tr>
-            <td colspan="3"><a href="#" id="backBtn" onclick="switchPage('newsList');">BACK</a></td>
+            <td colspan="3">
+                <a href="#" id="backBtn" onclick="switchPage('newsList');">НАЗАД</a>
+            </td>
         </tr>
         <tr>
             <td class="boldText">
                 {{:data.title}}
             </td>
             <td>
-                (by {{:data.author}})
+                (от {{:data.author}})
             </td>
             <td class="right-align">
                 {{:data.date}}
@@ -61,14 +63,14 @@
         </tr>
         <tr>
             <td class="right-align" colspan="2">
-                <input type="button" value="Send comment" id="sendCommentButton">
+                <input type="button" value="Оставить комментарий" id="sendCommentButton">
             </td>
             <td></td>
         </tr>
         <tr>
-            <td><a href="#" id="prevBtn">PREVIOUS</a></td>
+            <td><a href="#" id="prevBtn">РАНЕЕ</a></td>
             <td class="right-align" colspan="2">
-                <a href="#" class="right-align" id="nextBtn">NEXT</a>
+                <a href="#" class="right-align" id="nextBtn">ДАЛЕЕ</a>
             </td>
         </tr>
     </table>
@@ -95,7 +97,7 @@
         {{props authors}}
         <tr idx="{{>key}}">
             <td class="boldText">
-                Author:
+                Автор:
             </td>
             <td class="names">
                 <textarea idx="{{>key}}" rows="1" disabled>{{>prop}}</textarea>
@@ -108,12 +110,12 @@
                     $('#editAuthorsTable textarea[idx={{>key}}]').removeAttr('disabled');
                     $(this).parent('span').next('span').css('display','inline');
                     scrollOn();
-                ">Edit</a>
+                ">Правка</a>
                 </span>
                 <span class="modify" style="display:none;">
-                <a href="#" onclick="updateAuthor('{{>key}}');">Update</a>
-                <a href="#" onclick="expireAuthor('{{>key}}');">Expire</a>
-                <a href="#" onclick="drawEditAuthors();">Cancel</a>
+                <a href="#" onclick="updateAuthor('{{>key}}');">Сохранить</a>
+                <a href="#" onclick="expireAuthor('{{>key}}');">Удалить</a>
+                <a href="#" onclick="drawEditAuthors();">Отмена</a>
                 </span>
             </td>
         </tr>
@@ -123,13 +125,13 @@
         </tr>
         <tr>
             <td class="boldText">
-                Add Author:
+                Новый автор:
             </td>
             <td>
                 <textarea class="newAuthorName" rows="1"></textarea>
             </td>
             <td class="menu">
-                <a href="#" onclick="addAuthor();">Save</a>
+                <a href="#" onclick="addAuthor();">Сохранить</a>
             </td>
         </tr>
     </table>
@@ -140,7 +142,7 @@
         {{props tags}}
         <tr idx="{{>key}}">
             <td class="boldText">
-                Tag:
+                Тэг:
             </td>
             <td class="names">
                 <textarea idx="{{>key}}" rows="1" disabled>{{>prop}}</textarea>
@@ -153,12 +155,12 @@
                     $('#editTagsTable textarea[idx={{>key}}]').removeAttr('disabled');
                     $(this).parent('span').next('span').css('display','inline');
                      scrollOn();
-                ">Edit</a>
+                ">Правка</a>
                 </span>
                 <span class="modify" style="display:none;">
-                <a href="#" onclick="updateTag('{{>key}}');">Update</a>
-                <a href="#" onclick="deleteTag('{{>key}}');">Delete</a>
-                <a href="#" onclick="drawEditTags();">Cancel</a>
+                <a href="#" onclick="updateTag('{{>key}}');">Сохранить</a>
+                <a href="#" onclick="deleteTag('{{>key}}');">Удалить</a>
+                <a href="#" onclick="drawEditTags();">Отмена</a>
                 </span>
             </td>
         </tr>
@@ -168,13 +170,13 @@
         </tr>
         <tr>
             <td class="boldText">
-                Add Tag:
+                Новый тэг:
             </td>
             <td>
                 <textarea class="newTagName" rows="1"></textarea>
             </td>
             <td class="menu">
-                <a href="#" onclick="addTag();">Save</a>
+                <a href="#" onclick="addTag();">Сохранить</a>
             </td>
         </tr>
     </table>
@@ -184,7 +186,7 @@
     <table id="addNewsTable">
         <tr>
             <td class="boldText">
-                Title:
+                Заголовок:
             </td>
             <td>
                 <textarea id="addNewsTitle" rows="1"></textarea>
@@ -192,7 +194,7 @@
         </tr>
         <tr>
             <td class="boldText">
-                Date:
+                Дата:
             </td>
             <td>
                 <input id="addNewsDate" type="datetime">
@@ -200,7 +202,7 @@
         </tr>
         <tr>
             <td class="boldText">
-                Brief:
+                Кратко:
             </td>
             <td class="">
                 <textarea id="addNewsBrief" rows="5"></textarea>
@@ -208,7 +210,7 @@
         </tr>
         <tr>
             <td class="boldText">
-                Content:
+                Содержание:
             </td>
             <td class="">
                 <textarea id="addNewsContent" rows="20"></textarea>
@@ -218,7 +220,7 @@
             <td></td>
             <td id="addNewsfilterCont">
                 <select id="addNewsAuthorSelect">
-                    <option value="0" label="All authors"></option>
+                    <option value="0" label="Все авторы"></option>
                     {{props authors}}
                     <option value="{{>key}}" label="{{>prop}}"></option>
                     {{/props}}
@@ -227,7 +229,7 @@
                     <div class="selectBox"
                          onclick="$('#ms2 .dropDown').css('display', $('#ms2 .dropDown').css('display') == 'none' ? 'block' : 'none')">
                         <select>
-                            <option>Select tags</option>
+                            <option>Выберите тэги</option>
                         </select>
                         <div class="overSelect"></div>
                     </div>
@@ -244,7 +246,7 @@
         <tr>
             <td></td>
             <td class="right-align">
-                <input type="button" id="addNewsSaveBtn" value="Save">
+                <input type="button" id="addNewsSaveBtn" value="Сохранить">
             </td>
         </tr>
     </table>
@@ -254,16 +256,16 @@
     <div id="menu">
         <ul>
             <li>
-                <a onclick="drawNewsList()" href="#">News List</a>
+                <a onclick="drawNewsList()" href="#">Список новостей</a>
             </li>
             <li>
-                <a onclick="drawAddNews()" href="#">Add News</a>
+                <a onclick="drawAddNews()" href="#">Добавить новость</a>
             </li>
             <li>
-                <a onclick="drawEditAuthors()" href="#">Add/Update Authors</a>
+                <a onclick="drawEditAuthors()" href="#">Авторы</a>
             </li>
             <li>
-                <a onclick="drawEditTags()" href="#">Add/Update tags</a>
+                <a onclick="drawEditTags()" href="#">Тэги</a>
             </li>
         </ul>
     </div>
@@ -275,21 +277,21 @@
             <td>
                 <a id="bannerBtn" href="#">News portal
                     {{if user}}
-                    - Administration
+                    - Администрирование
                     {{/if}}
                 </a>
             </td>
             <td class="right-align">
                 {{if user}}
                 <span class="welcome">
-                    Hello, Admin {{:user}}!
+                    Привет, администратор {{:user}}!
                 </span>
                 <a href="#" id="logoutBtn"> Logout </a>
                 {{else}}
                 <a href="#" id="loginBtn"> Login </a>
                 {{/id}}
-                <a href="index"> EN </a>
-                <a href="locale-ru"> RU </a>
+                <a href="locale-en"> EN </a>
+                <a href="#"> RU </a>
             </td>
         </tr>
     </table>
@@ -299,16 +301,16 @@
     <form id="loginForm">
         <table>
             <tr>
-                <td><label>Login:</label></td>
+                <td><label>Логин:</label></td>
                 <td><input id="loginLogin" name="login" type="text"></td>
             </tr>
             <tr>
-                <td><label>Password:</label></td>
+                <td><label>Пароль:</label></td>
                 <td><input id="loginPass" name="password" type="password"></td>
             </tr>
             <tr>
                 <td></td>
-                <td><input id="loginSubmit" type="button" value="Login"></td>
+                <td><input id="loginSubmit" type="button" value="Вход"></td>
             </tr>
         </table>
     </form>
@@ -318,10 +320,11 @@
     <a href="#" id="{{:id}}" class="pgBtn{{:cls}}">{{:id}}</a>
 </script>
 
+
 <script id="tmpFilter" type="text/html">
     <div>
         <select id="authorFilter">
-            <option value="0" label="All authors"></option>
+            <option value="0" label="Все авторы"></option>
             {{props authors}}
             <option value="{{>key}}" label="{{>prop}}"></option>
             {{/props}}
@@ -330,20 +333,20 @@
             <div class="selectBox"
                  onclick="$('#ms1 .dropDown').css('display', $('#ms1 .dropDown').css('display') == 'none' ? 'block' : 'none')">
                 <select>
-                    <option>Select tags</option>
+                    <option>Выберите тэги</option>
                 </select>
                 <div class="overSelect"></div>
             </div>
             <div class="dropDown" id="tagsSelect"
                  onmouseleave=" $('#ms1 .dropDown').css('display', 'none');"
-                 onchange="var num=$('#ms1 input:checked').length;if(num>0)$('#ms1 option').text(num+' selected');else $('#ms1 option').text('Select tags');">
+                 onchange="var num=$('#ms1 input:checked').length;if(num>0)$('#ms1 option').text('Выбрано: '+num);else $('#ms1 option').text('Select tags');">
                 {{props tags}}
                 <label style="display: block;"><input value="{{>key}}" type="checkbox"/>{{>prop}}</label>
                 {{/props}}
             </div>
         </div>
-        <input type="button" value="Filter" onclick="setFilter();">
-        <input type="button" value="Reset" onclick="resetFilter();">
+        <input type="button" value="Применить" onclick="setFilter();">
+        <input type="button" value="Очистить" onclick="resetFilter();">
     </div>
 </script>
 
@@ -351,7 +354,7 @@
     <table id="newsListTable">
         {{for list ~u=user}}
         <tr>
-            <td colspan="2"><span class="boldText">{{>title}} </span><span> (by {{>author}})</span></td>
+            <td colspan="2"><span class="boldText">{{>title}} </span><span> (от {{>author}})</span></td>
             <td class="right-align">{{>date}}</td>
         </tr>
         <tr>
@@ -359,19 +362,19 @@
         </tr>
         <td colspan="3" class="right-align">
             <span class="tagsCol">{{>tags}}</span>
-            <span class="commentsCounter">Comments(<span idx="{{>id}}">{{>comments}}</span>)</span>
+            <span class="commentsCounter">Комментарии(<span idx="{{>id}}">{{>comments}}</span>)</span>
             {{if ~u}}
-            <span><a href="#" id="{{>id}}">Edit</a></span>
+            <span><a href="#" id="{{>id}}">Правка</a></span>
             <input type="checkbox" value="{{>id}}">
             {{else}}
-            <span><a href="#" id="{{>id}}">View</a></span>
+            <span><a href="#" id="{{>id}}">Подробнее</a></span>
             {{/if}}
         </td>
         {{/for}}
         {{if user && list.length}}
         <tr>
             <td colspan="3" class="right-align">
-                <input type="button" onclick="deleteNews();" value="Delete">
+                <input type="button" onclick="deleteNews();" value="Удалить">
             </td>
         </tr>
         {{/if}}

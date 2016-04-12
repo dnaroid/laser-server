@@ -193,3 +193,11 @@ td {
     /*top: -.2em;*/
     /*right: -.2em;*/
 }
+
+.loginError input[type=text] {
+    border-color: red;
+}
+
+.loginError input[type=password] {
+    border-color: red;
+}

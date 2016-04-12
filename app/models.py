@@ -111,9 +111,6 @@ class News(db.Model):
                            backref=db.backref('tags', lazy='dynamic'),
                            lazy='dynamic')
 
-    def set_author(self):
-        ...
-
     def get_comments(self):
         return Comments.query.filter(Comments.news_id == self.news_id).all()
 

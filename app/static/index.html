@@ -2,15 +2,45 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <link rel="stylesheet" href="/static/css/style.css">
-    <link rel="stylesheet" href="/static/css/ms.css">
 
-    <script type="text/javascript" src="/static/js/jquery.min.js"></script>
-    <script type="text/javascript" src="/static/js/jsrender.min.js"></script>
-    <script type="text/javascript" src="/static/js/service.js"></script>
     <title> News portal</title>
 </head>
 
+
+<body>
+<wrapper>
+    <div id="navigationCont" class="stop-scrolling"></div>
+    <content>
+        <div id="loginCont"></div>
+        <table>
+            <tr>
+                <td id="menuCol">
+                    <div id="menuCont"></div>
+                </td>
+                <td>
+                    <div id="newsViewCont"></div>
+                    <div id="newsListBlock">
+                        <div id="filterCont"></div>
+                        <div id="newsListCont"></div>
+                        <div id="paginateCont"></div>
+                    </div>
+                </td>
+
+            </tr>
+        </table>
+    </content>
+    <footer>
+        Copyright ⓒ Vasiliy Tolkachov, 2016
+    </footer>
+</wrapper>
+</body>
+
+<link rel="stylesheet" href="/static/css/style.css">
+<link rel="stylesheet" href="/static/css/ms.css">
+
+<script type="text/javascript" src="/static/js/jquery.min.js"></script>
+<script type="text/javascript" src="/static/js/jsrender.min.js"></script>
+<script type="text/javascript" src="/static/js/service.js"></script>
 
 <script id="tmpShowNews" type="text/html">
     <table id="newsTable">
@@ -378,31 +408,5 @@
     </table>
 </script>
 
-<body>
-<wrapper>
-    <div id="navigationCont" class="stop-scrolling"></div>
-    <content>
-        <div id="loginCont"></div>
-        <table>
-            <tr>
-                <td id="menuCol">
-                    <div id="menuCont"></div>
-                </td>
-                <td>
-                    <div id="newsViewCont"></div>
-                    <div id="newsListBlock">
-                        <div id="filterCont"></div>
-                        <div id="newsListCont"></div>
-                        <div id="paginateCont"></div>
-                    </div>
-                </td>
 
-            </tr>
-        </table>
-    </content>
-    <footer>
-        Copyright ⓒ Vasiliy Tolkachov, 2016
-    </footer>
-</wrapper>
-</body>
 </html>

@@ -3,6 +3,7 @@ $(document).ready(function () {
 });
 
 
+
 function init() {
     user = getCookie('user');
     authorFilter = '0'

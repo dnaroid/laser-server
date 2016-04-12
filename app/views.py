@@ -304,6 +304,6 @@ def index():
     return app.send_static_file('index.html')
 
 
-@app.route('/locale-ru', methods=['GET'])
+@app.route('/ru', methods=['GET'])
 def locale_ru():
     return app.send_static_file('locale/ru/index.html')

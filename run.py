@@ -1,5 +1,7 @@
 #!env/bin/python
+import os
+
 from app import app
-app.run(debug=True)
 
-
+if os.environ['deployed'] != 'PythonAnywhere':
+    app.run(debug=True)
